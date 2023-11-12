@@ -8,6 +8,7 @@ import requests
 
 owner_name =""
 repositary_name = ""
+users = []
 
 class GitHUbRepAnalyser:
     
@@ -122,9 +123,9 @@ class GitHUbRepAnalyser:
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         #contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
-        contributions = soup.find('h2', class_='f4 text-normal mb-2').text.strip().split()[0]
+        #contributions = soup.find('h2', class_='f4 text-normal mb-2').text.strip().split()[0]
         #contributions = contributions_tag.text.strip().split()[0] if contributions_tag else '0'
-        return int(contributions.replace(',', ''))
+        return #int(contributions.replace(',', ''))
     
     def save_as_csv(self, filename, obj):
         # Check if the file exists
@@ -152,6 +153,7 @@ class Repository:
         self.forks = forks
         self.watchers = watchers
         self.pull_requests = []
+        
 
     def csv_Headers(self):
         return "owner,name,description,homepage,license,forks,watchers"
@@ -165,6 +167,7 @@ class Repository:
 
 
 class PullRequest:
+    global users
     def __init__(self, title, number, body, state, created_at, closed_at, user, commits, additions, deletions, changed_files):
         self.title = title
         self.number = number
@@ -177,6 +180,7 @@ class PullRequest:
         self.additions = additions
         self.deletions = deletions
         self.changed_files = changed_files
+        users.append(user)
 
 class User:
     def __init__(self, username, repositories, followers, following, contributions):
@@ -195,6 +199,7 @@ class User:
 
 
 def main():
+   global users
    print(" Choose one of the bleow options to start exploring & analysing the Repository")
    print("1. If you would like to specify the names of Owner & the repository")
    print("2. If you would like to provide details in below format owner/repository")
@@ -217,7 +222,16 @@ def main():
    repositoryAnalyser_obj.collect_pull_requests(owner_name, repositary_name)
    
    #Code to display the list of uses that are gathered from Full requests
+   url = f'https://api.github.com/users'
+   response = requests.get(url)
+   user_data = response.json()
+   print("User Data is : \n")
 
+   print(user_data)
+   print("user name are below : \n ")
+
+   new_names = list(set(users))
+   print(new_names)
 
 
    #To the user name as input to collect the details
