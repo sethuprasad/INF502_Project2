@@ -18,7 +18,7 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       self.access_token = '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'
+       self.access_token = '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'
        self.headers = {
             'Authorization': f'token {self.access_token}',
             'Accept': 'application/vnd.github.v3+json'
@@ -160,17 +160,32 @@ class GitHUbRepAnalyser:
         user_data = response.json()
 
         print("User Dtaa retrived is below : ", user_data)
+
+
+        if isinstance(user_data, list) and user_data:
+            # Check if user_data is a non-empty list
+            first_user = user_data[0]  # Access the first user's data
+            repositories = first_user.get('public_repos', 0)
+            followers = first_user.get('followers', 0)
+            following = first_user.get('following', 0)
+            contributions = self.scrape_user_contributions(username)
+            
+        else:
+            #Yet to implement Try catch for this issue
+            print("Invlid format of accessing the data")
+
+        '''print("User Dtaa retrived is below : ", user_data)
         # Extracting relevant information
         repositories = user_data.get('public_repos', 0)
         followers = user_data.get('followers', 0)
         following = user_data.get('following', 0)
         #contributions = self.scrape_user_contributions(username)
-        contributions = ""
+        contributions = ""'''
 
         # Creating object for user class
         user = User(username, repositories, followers, following, contributions)
 
-        print(f"Details of {username} in {repo_name} are : \n",username, repositories, followers, following, contributions)
+        print(f"Details of user : {username} in repository {repo_name} are : \n",username, repositories, followers, following, contributions)
         self.save_as_csv('users.csv', user)
 
     def scrape_user_contributions(self, username):
