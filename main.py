@@ -59,7 +59,7 @@ class GitHUbRepAnalyser:
         repoData_obj = Repository(owner, repo_name, description, homepage, license, forks, watchers)
         self.repositories.append(repoData_obj)
 
-        #to check the values being passed
+        #to check the values being passed - personal self validation 
         repoData_obj.check()
 
     
@@ -67,6 +67,11 @@ class GitHUbRepAnalyser:
         #GitHub API to collect pull requests data
         url = f'https://api.github.com/search/issues?q=is:pr+repo:{owner}/{repo_name}'
         response = requests.get(url)
+
+        # TO check the rate of limit 
+   
+
+
         pull_request_data = response.json().get('items', [])
 
         #PullRequest objects corresponding repository details
@@ -101,20 +106,32 @@ class GitHUbRepAnalyser:
 
         return {'commits': commits, 'additions': additions, 'deletions': deletions, 'changed_files': changed_files}
     
-    def collect_user_data(self, username):
+    def collect_user_data(self, username, repo_name):
         # Use GitHub API to collect user data
-        url = f'https://api.github.com/users/{username}'
+        url = f'https://api.github.com/repos/{username}/{repo_name}/contributors'
+
+
         response = requests.get(url)
+
+        #To  Check the status code for the response received
+        print("Stauscode for the request under collecting user data is : ", response.status_code)
+
+        # Print the content of the request
+        #print(response.content)
+
         user_data = response.json()
 
         # Extracting relevant information
         repositories = user_data.get('public_repos', 0)
         followers = user_data.get('followers', 0)
         following = user_data.get('following', 0)
-        contributions = self.scrape_user_contributions(username)
+        #contributions = self.scrape_user_contributions(username)
+        contributions = ""
 
         # Creating object for user class
         user = User(username, repositories, followers, following, contributions)
+
+        print(f"Details of {username} in {repo_name} are : \n",username, repositories, followers, following, contributions)
         self.save_as_csv('users.csv', user)
 
     def scrape_user_contributions(self, username):
@@ -217,26 +234,39 @@ def main():
       owner_name = values[0]
       repositary_name = values[1]
 
+   ''' #check the rate linit for the github access 
+   url = f'https://api.github.com/repos/{owner_name}/{repositary_name}/rate_limit'
+   headers = {'Authorization': 'token YOUR-OAUTH-TOKEN'}
+   response = requests.get(url, headers=headers)
+
+    # Print the rate limit information
+   print("Rate of limit is : \n",response.json())'''
+
+
+
    repositoryAnalyser_obj = GitHUbRepAnalyser()
    repositoryAnalyser_obj.collect_repository_data(owner_name, repositary_name)
    repositoryAnalyser_obj.collect_pull_requests(owner_name, repositary_name)
    
-   #Code to display the list of uses that are gathered from Full requests
-   url = f'https://api.github.com/users'
+   #Code to display the list of uses that are gathered from pull requests
+   '''url = f'https://api.github.com/users'
    response = requests.get(url)
    user_data = response.json()
    print("User Data is : \n")
 
-   print(user_data)
-   print("user name are below : \n ")
+   print(user_data)'''
 
+
+   print("Below are the list of User Names  : \n ")
    new_names = list(set(users))
    print(new_names)
 
 
    #To the user name as input to collect the details
    UserName_to_collectDetails = input("Enter the User name from the above list that you are interested in collect the details :  ")
-   repositoryAnalyser_obj.collect_user_data(UserName_to_collectDetails)
+   repositoryAnalyser_obj.collect_user_data(UserName_to_collectDetails, repositary_name)
+
+
 
 
 main()
