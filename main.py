@@ -10,10 +10,19 @@ owner_name =""
 repositary_name = ""
 users = []
 
+
+
 class GitHUbRepAnalyser:
+    
     
     def __init__(self):
        self.repositories = []
+       #Access token to avoid the rate of limit for accesing the github
+       self.access_token = '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'
+       self.headers = {
+            'Authorization': f'token {self.access_token}',
+            'Accept': 'application/vnd.github.v3+json'
+       }
 
     '''
    #alternate code to get the required details from the content received
@@ -42,7 +51,19 @@ class GitHUbRepAnalyser:
     def collect_repository_data(self, owner, repo_name):
         # Using GitHub API to collect repository data
         url = f'https://api.github.com/repos/{owner}/{repo_name}'
-        response = requests.get(url)
+
+        #print("Auth is: ",self.access_token, " Header is : ", self.headers)
+
+
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 200:
+            print("Request Successful - Ok : ", response.status_code)
+        else:
+            # Print an error message if the request was not successful
+            print(f"Error: {response.status_code} - {response.json()['message']}")
+        
+            
         repo_data = response.json()
 
         
@@ -66,11 +87,14 @@ class GitHUbRepAnalyser:
     def collect_pull_requests(self, owner, repo_name):
         #GitHub API to collect pull requests data
         url = f'https://api.github.com/search/issues?q=is:pr+repo:{owner}/{repo_name}'
-        response = requests.get(url)
+        response = requests.get(url,headers=self.headers)
 
-        # TO check the rate of limit 
+        if response.status_code == 200:
+            print("Request Successful - Ok : ", response.status_code)
+        else:
+            # Print an error message if the request was not successful
+            print(f"Error: {response.status_code} - {response.json()['message']}")
    
-
 
         pull_request_data = response.json().get('items', [])
 
@@ -96,7 +120,15 @@ class GitHUbRepAnalyser:
     def get_pull_request_details(self, owner, repo_name, number):
         # query to get details like commits, additions, deletions, changed_files
         url = f'https://api.github.com/repos/{owner}/{repo_name}/pulls/{number}'
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 200:
+            print("Request Successful - Ok : ", response.status_code)
+        else:
+            # Print an error message if the request was not successful
+            print(f"Error: {response.status_code} - {response.json()['message']}")
+
+        
         pr_details = response.json()
 
         commits = pr_details.get('commits', 0)
@@ -111,16 +143,23 @@ class GitHUbRepAnalyser:
         url = f'https://api.github.com/repos/{username}/{repo_name}/contributors'
 
 
-        response = requests.get(url)
-
+        response = requests.get(url,headers=self.headers)
         #To  Check the status code for the response received
-        print("Stauscode for the request under collecting user data is : ", response.status_code)
+        if response.status_code == 200:
+            print("Request Successful - Ok : ", response.status_code)
+        else:
+            # Print an error message if the request was not successful
+            print(f"Error: {response.status_code} - {response.json()['message']}")
+
+        
+        #print("Stauscode for the request under collecting user data is : ", response.status_code)
 
         # Print the content of the request
         #print(response.content)
 
         user_data = response.json()
 
+        print("User Dtaa retrived is below : ", user_data)
         # Extracting relevant information
         repositories = user_data.get('public_repos', 0)
         followers = user_data.get('followers', 0)
@@ -137,7 +176,7 @@ class GitHUbRepAnalyser:
     def scrape_user_contributions(self, username):
         # To Scrape the user contributions from the GitHub profile page as per requirement
         url = f'https://github.com/{username}?tab=overview&from={datetime.datetime.now().year - 1}-12-01'
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
         soup = BeautifulSoup(response.content, 'html.parser')
         #contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
         #contributions = soup.find('h2', class_='f4 text-normal mb-2').text.strip().split()[0]
