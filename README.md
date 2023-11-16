@@ -8,5 +8,5 @@ We have planned to have every one as a group leader on weekly basis, for the **1
 
 **Initial code Access details:**
 
-Using the ** requests** library we are making the api calls(**import requests**)
+Using the **requests** library we are making the api calls(**import requests**)
 **URL format being used:**   url = 'https://api.github.com/repos/{owner}/{repo_name}'
