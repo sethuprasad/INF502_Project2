@@ -1,10 +1,9 @@
 # Project 2
 
 # functions to add to class GitHUbRepAnalyser
-def show_repositories(self):
-    for rep in self.repositories
-        print(rep.name)
 
+
+# main function with menu 
 def main():
     global users # declare users as global variable 
 
@@ -26,26 +25,53 @@ def main():
             rep = input("Enter the name of the repository: ") # get repository name
             owner = input("Enter the name of the repository owner: ") # get owner name 
 
-            
-        # get repository data 
-        rep_analyzer.collect_repository_data(owner, rep)
-        # get pull request data 
-        rep_analyzer.collect_pull_requests(owner, rep)
-        # get user data 
-        print("The following are the usernames collected from pull requests: ")
-        print(list(set(users))) 
-        username = print("If you would like to get information about one of these users, enter the username here: ")
-        rep_analyzer.collect_user_data(username, rep)
-        
-    elif userchoice == '2':
+            # get repository data 
+            rep_analyzer.collect_repository_data(owner, rep)
+            # get pull request data 
+            rep_analyzer.collect_pull_requests(owner, rep)
+            # get user data 
+            print("The following are the usernames collected from pull requests: ")
+            print(list(set(users))) 
+            username = print("If you would like to get information about one of these users, enter the username here: ")
+            rep_analyzer.collect_user_data(username, rep)
 
-    elif userchoice == '3':
+        # Show all repositories collected (with submenu of actions possible on each repo)
+        elif userchoice == '2':
+            # show all repositories collected 
+            for rep in self.repositories:
+                print(rep.name)
+            while True:
+                # submenu options
+                print("\nPlease select one of the following submenu options: ")
+                print("1. Show all pull requests from a certain repository")
+                print("2. Show the summary of a repository")
+                print("3. Create and store visual representation data about the repository")
+                print("4. Calculate the correlation between all the numeric data in the pull requests for a repository")
+                print("5. Return to the main menu")
 
-    elif userchoice == '4':
+                # get user input 
+                userchoice_sub = input("Enter your choice: ")
 
-    elif userchoise == '5':
-        return None, None, None  # Exit the program
-    else:
-        print("\nPLEASE SELECT A VALID OPTION\n")
+                if userchoice_sub == '1':
+                    # Show all pull requests from a certain repository
+                elif userchoice_sub == '2':
+
+                elif userchoice_sub == '3':
+
+                elif userchoice_sub == '4':
+
+                elif userchoice_sub == '5':
+                    break
+                else: 
+                    print("\nPLEASE SELECT A VALID OPTION\n")       
+
+        elif userchoice == '3':
+
+        elif userchoice == '4':
+
+        elif userchoise == '5':
+            return None, None, None  # Exit the program
+        else:
+            print("\nPLEASE SELECT A VALID OPTION\n")
         
         
