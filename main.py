@@ -5,6 +5,7 @@ import datetime
 import os
 from bs4 import BeautifulSoup
 import requests
+import configparser
 
 owner_name =""
 repositary_name = ""
@@ -13,13 +14,18 @@ users = []
 
 
 class GitHUbRepAnalyser:
-    
+
     
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       print(os.environ.get('GITHUB_TOKEN')  )
-       self.access_token = os.environ.get('GITHUB_TOKEN')  
+
+       config = configparser.ConfigParser()
+       config.read('config.ini')
+
+       #print(os.environ.get('GITHUB_TOKEN'))
+       #print(config['GitHub']['token'])
+       self.access_token = config['GitHub']['token']
        self.headers = {
             'Authorization': f'token {self.access_token}',
             'Accept': 'application/vnd.github.v3+json'
