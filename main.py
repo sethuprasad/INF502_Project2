@@ -18,7 +18,8 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       self.access_token = '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'
+       print(os.environ.get('GITHUB_TOKEN')  )
+       self.access_token = os.environ.get('GITHUB_TOKEN')  
        self.headers = {
             'Authorization': f'token {self.access_token}',
             'Accept': 'application/vnd.github.v3+json'
