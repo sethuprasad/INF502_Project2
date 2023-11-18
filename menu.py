@@ -1,10 +1,14 @@
+import pandas
+import matplotlib
+
 # should make some of these in functions in the GitHUbRepAnalyser Class
+# need to add pull requests to Users class 
 
 # main function with menu 
 def main():
     global users # declare users as global variable 
 
-    # create an instance of the GitHUbRepAnalyser class
+    # create instances of the GitHUbRepAnalyser class and User class 
     rep_analyzer = GitHUbRepAnalyser()
     
     while True:
@@ -52,7 +56,7 @@ def main():
                 if userchoice_sub == '1':
                     # Show all pull requests from a certain repository
                     repo_name = input("Enter the name of repository: ") 
-                    # locate repository using name 
+                    # locate the repository using name 
                     repo = next((r for r in self.repositories if r.name == repo_name), None)
                     if repo:
                         # print each pull request number and title
@@ -64,7 +68,7 @@ def main():
                 elif userchoice_sub == '2':
                     # Show the summary of a repository
                     repo_name = input("Enter the name of repository: ") 
-                    # locate repository using name 
+                    # locate the repository using name 
                     repo = next((r for r in self.repositories if r.name == repo_name), None)
                     if repo:
                         # Number of pull requests in `open` state
@@ -86,8 +90,57 @@ def main():
                     print(f"Date of the oldest pull request: {old_date}")
                 
                 elif userchoice_sub == '3':
+                    # Create and store visual representation data about the repository
+                    repo_name = input("Enter the name of repository: ") 
+                    # locate the repository using name 
+                    repo = next((r for r in self.repositories if r.name == repo_name), None)
+                    if repo:
+                        # get all data
+                        rep_dat = {
+                            'State': [pull.state for pull in repo.pull_requests], 
+                            'Commits': [pull.commits for pull in repo.pull_requests], 
+                            'Additions': [pull.additions for pull in repo.pull_requests], 
+                            'Deletions': [pull.deletions for pull in repo.pull_requests], 
+                            'Changed_files': [pull.changed_files for pull in repo.pull_requests], 
+                            'Author_assoc': [pull.user for pull in repo.pull_requests], 
+                        }
 
+                        # convert to df 
+                        rep_df = pd.DataFrame(rep_dat)
+                    
+                        # A boxplot that compares closed vs. open pull requests in terms of number of commits
+                    
+                        # A boxplot that compares closed vs. open pull requests in terms of additions and deletions
+                    
+                        # A boxplot that compares the number of changed files grouped by the author association
+                    
+                        # A scatterplot that shows the relationship between additions and deletions
+                    else:
+                        print(f"Repository '{repo_name}' not found.")    
+
+                    
                 elif userchoice_sub == '4':
+                    # Calculate the correlation between all the numeric data in the pull requests for a repository
+                    repo_name = input("Enter the name of repository: ") 
+                    # locate the repository using name 
+                    repo = next((r for r in self.repositories if r.name == repo_name), None)
+                    if repo:
+                        # get all data
+                        rep_dat = {
+                            'Commits': [pull.commits for pull in repo.pull_requests], 
+                            'Additions': [pull.additions for pull in repo.pull_requests], 
+                            'Deletions': [pull.deletions for pull in repo.pull_requests], 
+                            'Changed_files': [pull.changed_files for pull in repo.pull_requests],
+                        }
+
+                        # convert to df 
+                        rep_df = pd.DataFrame(rep_dat)
+
+                        # get correlations 
+                        corrs = rep_df.corr()
+                        
+                        # print 
+                        print(f"Correlations for {repo_name} \n {corrs}")                     
 
                 elif userchoice_sub == '5':
                     break
@@ -95,9 +148,36 @@ def main():
                     print("\nPLEASE SELECT A VALID OPTION\n")       
 
         elif userchoice == '3':
+            # Create and store visual representation data about all the repositories
 
+            # A line graph showing the total number of pull requests per day
+            
+            # A line graph comparing number of open and closed pull requests per day
+            
+            # A bar plot comparing the number of users per repository
+            
         elif userchoice == '4':
+            # Calculate the correlation between the data collected for the users - following, followers, 
+            # number of pull requests, number of contributions, etc.
+            if users:
+                user_dat = {
+                    'Following': [user.following for user in users], 
+                    'Followers': [user.followers for user in users], 
+                    'Num_pull' : [len(user.pull_requests) for user in users],     
+                    'Num_contr' : [user.contributions for user in users]}
+                
+                # convert to df 
+                user_df = pd.DataFrame(user_dat)
 
+                # get correlations 
+                corrs = user_df.corr()
+                        
+                # print 
+                print(f"Correlations between data collected for users \n {corrs}")   
+
+            else:
+                print("No user data found.")
+                        
         elif userchoise == '5':
             return None, None, None  # Exit the program
         else:
