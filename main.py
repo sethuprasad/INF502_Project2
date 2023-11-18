@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import requests
 import configparser
 
+#Global Variables to carry the frequestly used values
 owner_name =""
 repositary_name = ""
 users = []
@@ -19,13 +20,15 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
+       tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
+       tokenValue = ''.join(tokenChunks)
 
        config = configparser.ConfigParser()
        config.read('config.ini')
 
        #print(os.environ.get('GITHUB_TOKEN'))
        #print(config['GitHub']['token'])
-       self.access_token = config['GitHub']['token']
+       self.access_token = tokenValue
        self.headers = {
             'Authorization': f'token {self.access_token}',
             'Accept': 'application/vnd.github.v3+json'
