@@ -1,7 +1,7 @@
 
 #from github import Github
 
-import datetime
+from datetime import datetime
 import os
 from bs4 import BeautifulSoup
 import requests
@@ -65,10 +65,12 @@ class GitHUbRepAnalyser:
         #print("Auth is: ",self.access_token, " Header is : ", self.headers)
 
 
+        #Requesting GitHUb API with required details
         response = requests.get(url, headers=self.headers)
-
+        
+        #Validating the Response Status code 
         if response.status_code == 200:
-            print("Request Successful - Ok : ", response.status_code)
+            print("Repository Data - Request Successful - Ok : ", response.status_code)
         else:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
@@ -82,31 +84,47 @@ class GitHUbRepAnalyser:
         license = repo_data.get('license', {}).get('name', '')
         forks = repo_data.get('forks_count', 0)
         watchers = repo_data.get('watchers_count', 0)
+        currentDate = datetime.now()
 
         
         print(owner, repo_name, description, homepage, license, forks, watchers)
+
+        #Pring the same in a readable format
+        print(f"The Details of Repository \" {repo_name} \" Owned by {owner} are below")
+        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {license} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
+
+
 
         # Creating object for Repositary class to store the required details fetched 
         repoData_obj = Repository(owner, repo_name, description, homepage, license, forks, watchers)
         self.repositories.append(repoData_obj)
 
         #to check the values being passed - personal self validation 
-        repoData_obj.check()
+        #repoData_obj.check()
 
     
     def collect_pull_requests(self, owner, repo_name):
         #GitHub API to collect pull requests data
         url = f'https://api.github.com/search/issues?q=is:pr+repo:{owner}/{repo_name}'
+
+        #Requesting GitHUb API with required details
         response = requests.get(url,headers=self.headers)
 
+        #Validating the Response Status code 
         if response.status_code == 200:
-            print("Request Successful - Ok : ", response.status_code)
+            print(" Pull Request - Request Successful - Ok : ", response.status_code)
         else:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
    
 
         pull_request_data = response.json().get('items', [])
+
+        print("Pull Request data is : ")
+        print(pull_request_data) 
+
+        #To be commented
+        print("Total Pull requests fetched :", len(pull_request_data))
 
         #PullRequest objects corresponding repository details
         for pr in pull_request_data:
@@ -117,6 +135,7 @@ class GitHUbRepAnalyser:
             created_at = pr.get('created_at', '')
             closed_at = pr.get('closed_at', '')
             user = pr.get('user', {}).get('login', '')
+
             
             # Additional query to get details like commits, additions, deletions, changed_files
             pr_details = self.get_pull_request_details(owner, repo_name, number)
@@ -200,7 +219,7 @@ class GitHUbRepAnalyser:
 
     def scrape_user_contributions(self, username):
         # To Scrape the user contributions from the GitHub profile page as per requirement
-        url = f'https://github.com/{username}?tab=overview&from={datetime.datetime.now().year - 1}-12-01'
+        url = f'https://github.com/{username}?tab=overview&from={datetime.now().year - 1}-12-01'
         response = requests.get(url, headers=self.headers)
         soup = BeautifulSoup(response.content, 'html.parser')
         #contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
