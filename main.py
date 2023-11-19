@@ -125,7 +125,9 @@ class GitHUbRepAnalyser:
 
         #To be commented
         print("Total Pull requests fetched :", len(pull_request_data))
+        
 
+        count =0
         #PullRequest objects corresponding repository details
         for pr in pull_request_data:
             title = pr.get('title', '')
@@ -136,12 +138,21 @@ class GitHUbRepAnalyser:
             closed_at = pr.get('closed_at', '')
             user = pr.get('user', {}).get('login', '')
 
-            
+            if(count < 5):
+                print(f"The Details of PR : {number} are :")
+                print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
+                count += 1
+            elif(count == 5):
+                print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                count += 1
+        
+
             # Additional query to get details like commits, additions, deletions, changed_files
             pr_details = self.get_pull_request_details(owner, repo_name, number)
 
             # creating obj for PullRequest class  
             pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
+            #self.save_as_csv('PullRequests.csv', pull_request)
             repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
             if repo:
                 repo.pull_requests.append(pull_request)
@@ -215,7 +226,7 @@ class GitHUbRepAnalyser:
         user = User(username, repositories, followers, following, contributions)
 
         print(f"Details of user : {username} in repository {repo_name} are : \n",username, repositories, followers, following, contributions)
-        self.save_as_csv('users.csv', user)
+        self.save_as_csv('users1.csv', user)
 
     def scrape_user_contributions(self, username):
         # To Scrape the user contributions from the GitHub profile page as per requirement
