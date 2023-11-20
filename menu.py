@@ -176,7 +176,7 @@ def main():
                     print("\nPLEASE SELECT A VALID OPTION\n")       
 
         elif userchoice == '3':
-            # Create and store visual representation data about all the repositories
+            # Create and store visual representation data to a data frame for all the repositories
             if self.repositories:
                 all_repo_data = []
                 for repo in self.repositories:
