@@ -1,5 +1,5 @@
-import pandas
-import matplotlib
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # should make some of these in functions in the GitHUbRepAnalyser Class
 # need to add pull requests to Users class 
@@ -23,18 +23,21 @@ def main():
     
         # Collect data from a specific GitHub repository using owner and repository name 
         if userchoice == '1':
-            rep = input("Enter the name of the repository: ") # get repository name
-            owner = input("Enter the name of the repository owner: ") # get owner name 
-
-            # get repository data 
-            rep_analyzer.collect_repository_data(owner, rep)
-            # get pull request data 
-            rep_analyzer.collect_pull_requests(owner, rep)
-            # get user data 
-            print("The following are the usernames collected from pull requests: ")
-            print(list(set(users))) 
-            username = input("If you would like to get information about one of these users, enter the username here: ")
-            rep_analyzer.collect_user_data(username, rep)
+            try:
+                rep = input("Enter the name of the repository: ") # get repository name
+                owner = input("Enter the name of the repository owner: ") # get owner name 
+    
+                # get repository data 
+                rep_analyzer.collect_repository_data(owner, rep)
+                # get pull request data 
+                rep_analyzer.collect_pull_requests(owner, rep)
+                # get user data 
+                print("The following are the usernames collected from pull requests: ")
+                print(list(set(users))) 
+                username = input("If you would like to get information about one of these users, enter the username here: ")
+                rep_analyzer.collect_user_data(username, rep)
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
         # Show all repositories collected (with submenu of actions possible on each repo)
         elif userchoice == '2':
@@ -107,14 +110,39 @@ def main():
 
                         # convert to df 
                         rep_df = pd.DataFrame(rep_dat)
-                    
+                                        
                         # A boxplot that compares closed vs. open pull requests in terms of number of commits
-                    
+                        plt.figure(figsize=(min(12, len(rep_df) * 0.8), 8))
+                        rep_df.boxplot(column = "Commits", by="State", grid = False)
+                        plt.title("Boxplot Comparing Closed vs. Open Pull Requests")
+                        plt.xlabel("Pull Request State")
+                        plt.ylabel("Number of Commits")
+                        plt.show()
+                        
                         # A boxplot that compares closed vs. open pull requests in terms of additions and deletions
-                    
+                        plt.figure(figsize=(min(12, len(rep_df) * 0.8), 8))
+                        rep_df[["Additions", "Deletions", "State"]].boxplot(by="State", grid = False)
+                        plt.title("Boxplot of Additions and Deletions for Open vs. Closed Pull Requests")
+                        plt.xlabel("Pull Request State")
+                        plt.ylabel("Count")
+                        plt.show()
+                        
                         # A boxplot that compares the number of changed files grouped by the author association
-                    
+                        plt.figure(figsize=(min(12, len(rep_df) * 0.8), 8))
+                        rep_df.boxplot(column = "Changed_files", by = "Author_assoc", grid=False)
+                        plt.title("Boxplot of Changed Files Grouped by Author Associations")
+                        plt.xlabel("Author Association")
+                        plt.ylabel("Number of Changed Files")
+                        plt.show()
+                        
                         # A scatterplot that shows the relationship between additions and deletions
+                        plt.figure(figsize=(min(12, len(rep_df) * 0.8), 8))
+                        plt.scatter(rep_df["Additions"], rep_df["Deletions"])
+                        plt.title("Scatterplot of Additions vs. Deletions")
+                        plt.xlabel("Number of Additions")
+                        plt.ylabel("Number of Deletions")
+                        plt.show()
+                        
                     else:
                         print(f"Repository '{repo_name}' not found.")    
 
@@ -148,13 +176,52 @@ def main():
                     print("\nPLEASE SELECT A VALID OPTION\n")       
 
         elif userchoice == '3':
-            # Create and store visual representation data about all the repositories
-
-            # A line graph showing the total number of pull requests per day
-            
-            # A line graph comparing number of open and closed pull requests per day
-            
-            # A bar plot comparing the number of users per repository
+            # Create and store visual representation data to a data frame for all the repositories
+            if self.repositories:
+                all_repo_data = []
+                for repo in self.repositories:
+                    rep_dat = {
+                        'Name': repo.name,
+                        'Num_pulls': len(repo.pull_requests),
+                        'Num_open_pulls': sum(1 for pull in repo.pull_requests if pull.state == 'open'),
+                        'Num_closed_pulls': sum(1 for pull in repo.pull_requests if pull.state == 'closed'),
+                        'Num_users': len(set(pull.user for pull in repo.pull_requests)),
+                    }
+                    all_repo_data.append(rep_dat)
+                    
+                all_repo_df = pd.DataFrame(all_repo_data)
+                    
+                # A line graph showing the total number of pull requests per day
+                plt.figure(figsize = (min(12, len(all_repo_df) * 0.8), 8))
+                plt.plot(all_repo_df['Name'], all_repo_df['Num_pulls'], marker = 'o')
+                plt.title("Total number of Pull Requests per Repository per Day")
+                plt.xlabel("Repository Name")
+                plt.ylabel("Number of Pull Requests")
+                plt.xticks(rotation=45, ha = 'right')
+                plt.show()
+                
+                # A line graph comparing number of open and closed pull requests per day
+                plt.figure(figsize = (min(12, len(all_repo_df) * 0.8), 8))
+                plt.plot(all_repo_df["Name"], all_repo_df["Num_open_pulls"], marker = "o", label = "Open Pull Requests")
+                plt.plot(all_repo_df["Name"], all_repo_df["Num_closed_pulls"], marker = "o", label = "Closed Pull Requests")
+                plt.title("Number of Open and Closed Pull Requests per Repository per Day")
+                plt.xlabel("Repository Name")
+                plt.ylabel("Number of Pull Requests")
+                plt.legend()
+                plt.xticks(rotation = 45, ha = 'right')
+                plt.show()
+                
+                # A bar plot comparing the number of users per repository
+                plt.figure(figsize=(min(12, len(all_repo_df) * 0.8), 8))
+                plt.bar(all_repo_df["Name"], all_repo_df["Num_users"])
+                plt.title("Number of Users per Repository")
+                plt.xlabel("Repository Name")
+                plt.ylabel("Number of Users")
+                plt.xticks(rotation = 45, ha ="right")
+                plt.show()
+                
+            else:
+                print("No repositories found, please input a repository to learn more.")
             
         elif userchoice == '4':
             # Calculate the correlation between the data collected for the users - following, followers, 
@@ -178,7 +245,7 @@ def main():
             else:
                 print("No user data found.")
                         
-        elif userchoise == '5':
+        elif userchoice == '5':
             return None, None, None  # Exit the program
         else:
             print("\nPLEASE SELECT A VALID OPTION\n")
