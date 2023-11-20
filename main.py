@@ -1,6 +1,7 @@
 
 #from github import Github
 
+import csv
 from datetime import datetime
 import os
 from bs4 import BeautifulSoup
@@ -120,53 +121,105 @@ class GitHUbRepAnalyser:
 
         pull_request_data = response.json().get('items', [])
 
-        print("Pull Request data is : ")
-        print(pull_request_data) 
+        #print("Pull Request data is : ")
+       # print(pull_request_data) 
 
         #To be commented
-        print("Total Pull requests fetched :", len(pull_request_data))
+        #print("Total Pull requests fetched :", len(pull_request_data))
         
 
-        count =0
+        
+
+        #user response
+        decision = input("If you would like to access only First page of Pull Requests press(Y) or Press(N) for accessing all the pages of Pull Request : ")
+        every_Page_Response = input(" Would you like to receive a notification to proceed before moving to every new page Y/N : ")
+
         #PullRequest objects corresponding repository details
-        for pr in pull_request_data:
-            title = pr.get('title', '')
-            number = pr.get('number', '')
-            body = pr.get('body', '')
-            state = pr.get('state', '')
-            created_at = pr.get('created_at', '')
-            closed_at = pr.get('closed_at', '')
-            user = pr.get('user', {}).get('login', '')
+        if(decision.lower() == 'y'):
 
-            if(count < 5):
-                print(f"The Details of PR : {number} are :")
-                print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
-                count += 1
-            elif(count == 5):
-                print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
-                count += 1
-        
+            self.print_PullRequestsData(pull_request_data, owner, repo_name)
 
-            # Additional query to get details like commits, additions, deletions, changed_files
-            pr_details = self.get_pull_request_details(owner, repo_name, number)
+            ''' for pr in pull_request_data:
+                title = pr.get('title', '')
+                number = pr.get('number', '')
+                body = pr.get('body', '')
+                state = pr.get('state', '')
+                created_at = pr.get('created_at', '')
+                closed_at = pr.get('closed_at', '')
+                user = pr.get('user', {}).get('login', '')
 
-            # creating obj for PullRequest class  
-            pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
-            #self.save_as_csv('PullRequests.csv', pull_request)
-            repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
-            if repo:
-                repo.pull_requests.append(pull_request)
+                if(count < 5):
+                    print(f"The Details of PR : {number} are :")
+                    print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
+                    count += 1
+                elif(count == 5):
+                    print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                    count += 1
+            
+
+                # Additional query to get details like commits, additions, deletions, changed_files
+                pr_details = self.get_pull_request_details(owner, repo_name, number)
+
+                # creating obj for PullRequest class  
+                pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
+                #self.save_as_csv('PullRequests.csv', pull_request)
+                repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
+                if repo:
+                    repo.pull_requests.append(pull_request)'''
+
+        elif(decision.lower() == 'n'):
+            self.print_PullRequestsData(pull_request_data, owner, repo_name)
+            '''for pr in pull_request_data:
+                title = pr.get('title', '')
+                number = pr.get('number', '')
+                body = pr.get('body', '')
+                state = pr.get('state', '')
+                created_at = pr.get('created_at', '')
+                closed_at = pr.get('closed_at', '')
+                user = pr.get('user', {}).get('login', '')
+
+                if(count < 5):
+                    print(f"The Details of PR : {number} are :")
+                    print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
+                    count += 1
+                elif(count == 5):
+                    print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                    count += 1
+            
+
+                # Additional query to get details like commits, additions, deletions, changed_files
+                pr_details = self.get_pull_request_details(owner, repo_name, number)
+
+                # creating obj for PullRequest class  
+                pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
+                #self.save_as_csv('PullRequests.csv', pull_request)
+                repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
+                if repo:
+                    repo.pull_requests.append(pull_request)'''
+
+            while 'next' in response.links:
+                next_page_url = response.links['next']['url']
+                response = requests.get(next_page_url)
+                data = response.json()
+                pull_requests = data.get('items', [])
+                self.print_PullRequestsData(pull_requests, owner, repo_name)
+                if every_Page_Response.lower() == 'y':
+                    nextpage = input("Would you like to access the next page of Pull Requests Y/N : ")
+                    if nextpage.lower() == 'n':
+                        break
+
+
 
     def get_pull_request_details(self, owner, repo_name, number):
         # query to get details like commits, additions, deletions, changed_files
         url = f'https://api.github.com/repos/{owner}/{repo_name}/pulls/{number}'
         response = requests.get(url, headers=self.headers)
 
-        if response.status_code == 200:
-            print("Request Successful - Ok : ", response.status_code)
-        else:
+        if response.status_code != 200:
+            print("Request Un-Successfull : ", response.status_code)
+        #else:
             # Print an error message if the request was not successful
-            print(f"Error: {response.status_code} - {response.json()['message']}")
+            #print(f"Error: {response.status_code} - {response.json()['message']}")
 
         
         pr_details = response.json()
@@ -178,6 +231,38 @@ class GitHUbRepAnalyser:
 
         return {'commits': commits, 'additions': additions, 'deletions': deletions, 'changed_files': changed_files}
     
+    def print_PullRequestsData(self, pull_request_data,owner,repo_name):
+        count =0
+        for pr in pull_request_data:
+                title = pr.get('title', '')
+                number = pr.get('number', '')
+                body = pr.get('body', '')
+                state = pr.get('state', '')
+                created_at = pr.get('created_at', '')
+                closed_at = pr.get('closed_at', '')
+                user = pr.get('user', {}).get('login', '')
+
+                if(count < 5):
+                    print("\n","*"*20)
+                    print(f"The Details of PR : {number} are :")
+                    print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
+                    count += 1
+                elif(count == 5):
+                    print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                    count += 1
+            
+
+                # Additional query to get details like commits, additions, deletions, changed_files
+                pr_details = self.get_pull_request_details(owner, repo_name, number)
+
+                # creating obj for PullRequest class  
+                pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
+                #self.pr_csv('PullRequests.csv', pull_request)
+                repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
+                if repo:
+                    repo.pull_requests.append(pull_request)
+
+
     def collect_user_data(self, username, repo_name):
         # Use GitHub API to collect user data
         url = f'https://api.github.com/repos/{username}/{repo_name}/contributors'
@@ -249,6 +334,7 @@ class GitHUbRepAnalyser:
         with open(filename, 'a') as file:
             file.write(obj.to_csv() + '\n')
 
+   
 #repo = GitHUbRepAnalyser('google/jax')
 #details = repo.get_details()
 #print(details)
