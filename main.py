@@ -498,7 +498,7 @@ def main():
         # Show all repositories collected (with submenu of actions possible on each repo)
         elif userchoice == '2':
             # show all repositories collected 
-            for rep in self.repositories:
+            for rep in rep_analyzer.repositories:
                 print(rep.name)
             while True:
                 # submenu options
