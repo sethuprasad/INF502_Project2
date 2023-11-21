@@ -243,7 +243,7 @@ class GitHUbRepAnalyser:
                 user = pr.get('user', {}).get('login', '')
 
                 if(count < 5):
-                    print("\n","*"*20)
+                    print("\n","*"*50)
                     print(f"The Details of PR : {number} are :")
                     print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
                     count += 1
@@ -276,18 +276,27 @@ class GitHUbRepAnalyser:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
 
-        
+        user_data = response.json()
+
+        #print("User Dtaa retrived is below : ", user_data)
         #print("Stauscode for the request under collecting user data is : ", response.status_code)
 
         # Print the content of the request
         #print(response.content)
 
-        user_data = response.json()
+        # Filter contributors by the desired_username
+        user_contributions = [contributor for contributor in user_data if contributor['login'] == username]
 
-        print("User Dtaa retrived is below : ", user_data)
+        if user_contributions:
+            print(f"Details of user {username}:")
+            print(user_contributions[0])  # Prints the details of user
+        else:
+            print(f"User {username} not found among contributors.")
+
+      
 
 
-        if isinstance(user_data, list) and user_data:
+        '''if isinstance(user_data, list) and user_data:
             # Check if user_data is a non-empty list
             first_user = user_data[0]  # Access the first user's data
             repositories = first_user.get('public_repos', 0)
@@ -297,20 +306,21 @@ class GitHUbRepAnalyser:
             
         else:
             #Yet to implement Try catch for this issue
-            print("Invlid format of accessing the data")
+            print("Invlid format of accessing the data")'''
+        
 
-        '''print("User Dtaa retrived is below : ", user_data)
+        specific_User_data = user_contributions[0]
         # Extracting relevant information
-        repositories = user_data.get('public_repos', 0)
-        followers = user_data.get('followers', 0)
-        following = user_data.get('following', 0)
-        #contributions = self.scrape_user_contributions(username)
-        contributions = ""'''
+        repositories = specific_User_data.get('public_repos', 0)
+        followers = specific_User_data.get('followers', 0)
+        following = specific_User_data.get('following', 0)
+        contributions = self.scrape_user_contributions(username)
+        #contributions = ""
 
         # Creating object for user class
         user = User(username, repositories, followers, following, contributions)
 
-        print(f"Details of user : {username} in repository {repo_name} are : \n",username, repositories, followers, following, contributions)
+        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\n repositories : ", repositories, "\nFollowers : ", followers, "\n Following : ", following, "\nContributors : ", contributions )
         self.save_as_csv('users1.csv', user)
 
     def scrape_user_contributions(self, username):
@@ -318,10 +328,10 @@ class GitHUbRepAnalyser:
         url = f'https://github.com/{username}?tab=overview&from={datetime.now().year - 1}-12-01'
         response = requests.get(url, headers=self.headers)
         soup = BeautifulSoup(response.content, 'html.parser')
-        #contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
+        contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
         #contributions = soup.find('h2', class_='f4 text-normal mb-2').text.strip().split()[0]
-        #contributions = contributions_tag.text.strip().split()[0] if contributions_tag else '0'
-        return #int(contributions.replace(',', ''))
+        contributions = contributions_tag.text.strip().split()[0] if contributions_tag else '0'
+        return int(contributions.replace(',', ''))
     
     def save_as_csv(self, filename, obj):
         # Check if the file exists
