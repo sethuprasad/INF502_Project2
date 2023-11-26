@@ -264,11 +264,18 @@ class GitHUbRepAnalyser:
                 if repo:
                     repo.pull_requests.append(pull_request)
 
+    def get_Data(self, url):
+        response = requests.get(url,headers=self.headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+
 
     def collect_user_data(self, username, repo_name):
         # Use GitHub API to collect user data
         url = f'https://api.github.com/repos/{username}/{repo_name}/contributors'
-
 
         response = requests.get(url,headers=self.headers)
         #To  Check the status code for the response received
@@ -293,9 +300,9 @@ class GitHUbRepAnalyser:
             print(f"Details of user {username}:")
             print(user_contributions[0])  # Prints the details of user
         else:
-            print(f"User {username} not found among contributors.")
-
-      
+            print(f"Given User {username} is inactive among the contributors. Please try with different user name")
+            username = input("If you would like to get information about one of these users, enter the username here: ")
+            self.collect_user_data(username, repo_name)      
 
 
         '''if isinstance(user_data, list) and user_data:
@@ -313,25 +320,53 @@ class GitHUbRepAnalyser:
 
         specific_User_data = user_contributions[0]
         # Extracting relevant information
-        repositories = specific_User_data.get('public_repos', 0)
+        '''repositories = specific_User_data.get('public_repos', 0)
         followers = specific_User_data.get('followers', 0)
         following = specific_User_data.get('following', 0)
+        UserCOntibutions = specific_User_data.get('contributions', 0)
         contributions = self.scrape_user_contributions(username)
-        #contributions = ""
+        #contributions = ""'''
 
+        followers_url = f'https://api.github.com/users/{username}/followers'
+        following_url = f'https://api.github.com/users/{username}/following'
+        repos_url = f'https://api.github.com/users/{username}/repos'
+
+
+        # Get followers count
+        followers_data = self.get_Data(followers_url)
+        followers_count = len(followers_data) if followers_data else 0
+
+        # Get following count
+        following_data = self.get_Data(following_url)
+        following_count = len(following_data) if following_data else 0
+
+        # Get repositories count
+        repos_data = self.get_Data(repos_url)
+        repos_count = len(repos_data) if repos_data else 0
+
+        #UserContibutions = specific_User_data.get('contributions')
+
+        #print("**********", user_contributions[0]['contributions'])
+        TotalContribution = user_contributions[0]['contributions']
+        contributions_lastYear = self.scrape_user_contributions(username)
+
+        #print("-------------- Contribution details from web scraping : \n ", contributions)
         # Creating object for user class
-        user = User(username, repositories, followers, following, contributions)
 
-        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\n repositories : ", repositories, "\nFollowers : ", followers, "\n Following : ", following, "\nContributors : ", contributions )
+        user = User(username, repos_count, followers_count, following_count, contributions_lastYear)
+
+        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\n repositories : ", repos_count, "\nFollowers : ", followers_count, "\n Following : ", following_count, "\nContributions in last year : ", contributions_lastYear, "\nTotal Contributions : ",TotalContribution,  )
         self.save_as_csv('users1.csv', user)
 
     def scrape_user_contributions(self, username):
         # To Scrape the user contributions from the GitHub profile page as per requirement
+    
         url = f'https://github.com/{username}?tab=overview&from={datetime.now().year - 1}-12-01'
-        response = requests.get(url, headers=self.headers)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        response = requests.get(url)
+        
+        soup = BeautifulSoup(response.content, 'lxml')
         contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
-        #contributions = soup.find('h2', class_='f4 text-normal mb-2').text.strip().split()[0]
+        
         contributions = contributions_tag.text.strip().split()[0] if contributions_tag else '0'
         return int(contributions.replace(',', ''))
     
