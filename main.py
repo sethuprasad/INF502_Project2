@@ -501,7 +501,7 @@ def main():
     global users # declare users as global variable 
 
     # create instances of the GitHUbRepAnalyser class and User class 
-    rep_analyzer = GitHUbRepAnalyser()
+    rep_analyzers = {}
     
     while True:
         print("\nWelcome to the *APP NAME?* application. \nThis is the main menu; please select one of the following options.\n")
@@ -519,6 +519,10 @@ def main():
                 print("Hint: you can get the owner and repository name from the top left corner of the GitHub page you are looking at")
                 rep = input("Enter the name of the repository: ") # get repository name
                 owner = input("Enter the name of the repository owner: ") # get owner name 
+                
+                # Create instance for repository and store
+                rep_analyzer = GitHUbRepAnalyser()
+                rep_analyzers[(owner,rep)] = rep_analyzer
     
                 # get repository data 
                 rep_analyzer.collect_repository_data(owner, rep)
@@ -535,8 +539,8 @@ def main():
         # Show all repositories collected (with submenu of actions possible on each repo)
         elif userchoice == '2':
             # show all repositories collected 
-            for rep in rep_analyzer.repositories:
-                print(rep.name)
+            for (owner, rep), rep_analyzer in rep_analyzer.items():
+                print(f"Repository: {rep}, Owner: {owner}")
             while True:
                 # submenu options
                 print("\nPlease select one of the following submenu options: ")
@@ -670,7 +674,7 @@ def main():
 
         elif userchoice == '3':
             # Create and store visual representation data to a data frame for all the repositories
-            if self.repositories:
+            if rep_analyzers:
                 all_repo_data = []
                 for repo in self.repositories:
                     rep_dat = {
