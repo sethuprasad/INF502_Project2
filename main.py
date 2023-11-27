@@ -500,6 +500,7 @@ import matplotlib.pyplot as plt
 def main():
     global users # declare users as global variable 
 
+    # I updated this variable to a dictionary that stores the owner and repo name as a tuple
     # create Dictionary for the different repositories passed  
     rep_analyzers = {}
     
@@ -754,9 +755,6 @@ def main():
         else:
             print("\nPLEASE SELECT A VALID OPTION\n")
         
-        
-
-
-
+  
 
 main()
