@@ -500,7 +500,7 @@ import matplotlib.pyplot as plt
 def main():
     global users # declare users as global variable 
 
-    # create instances of the GitHUbRepAnalyser class and User class 
+    # create Dictionary for the different repositories passed  
     rep_analyzers = {}
     
     while True:
@@ -556,11 +556,11 @@ def main():
                 if userchoice_sub == '1':
                     # Show all pull requests from a certain repository
                     repo_name = input("Enter the name of repository: ") 
-                    # locate the repository using name 
-                    repo = next((r for r in self.repositories if r.name == repo_name), None)
-                    if repo:
+                    # locate the repository using name
+                    rep_analyzer = rep_analyzers.get((owner, repo_name))
+                    if rep_analyzer:
                         # print each pull request number and title
-                        for pull in repo.pull_requests:
+                        for pull in rep_analyzer.pull_requests:
                             print(f"Pull request {pull.number}, {pull.title}") 
                     else:
                         print(f"Repository '{repo_name}' not found.")
@@ -569,16 +569,16 @@ def main():
                     # Show the summary of a repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    repo = next((r for r in self.repositories if r.name == repo_name), None)
-                    if repo:
+                    rep_analyzer = rep_analyzers.get((owner, repo_name))
+                    if rep_analyzer:
                         # Number of pull requests in `open` state
-                        num_open = sum(1 for pull in repo.pull_requests if pull.state == 'open')
+                        num_open = sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'open')
                         # Number of pull requests in `closed` state
-                        num_close = sum(1 for pull in repo.pull_requests if pull.state == 'closed')
+                        num_close = sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'closed')
                         # Number of users
-                        num_users = len(set(pull.user for pull in repo.pull_requests))
+                        num_users = len(set(pull.user for pull in rep_analyzer.pull_requests))
                         # Date of the oldest pull request
-                        old_date = min(pull.created_at for pull in repo.pull_requests)                        
+                        old_date = min(pull.created_at for pull in rep_analyzer.pull_requests)
                     else:
                         print(f"Repository '{repo_name}' not found.")    
                         
@@ -592,17 +592,17 @@ def main():
                 elif userchoice_sub == '3':
                     # Create and store visual representation data about the repository
                     repo_name = input("Enter the name of repository: ") 
-                    # locate the repository using name 
-                    repo = next((r for r in self.repositories if r.name == repo_name), None)
-                    if repo:
+                    # locate the repository using name
+                    rep_analyzer = rep_analyzers.get((owner, repo_name))
+                    if rep_analyzer:
                         # get all data
                         rep_dat = {
-                            'State': [pull.state for pull in repo.pull_requests], 
-                            'Commits': [pull.commits for pull in repo.pull_requests], 
-                            'Additions': [pull.additions for pull in repo.pull_requests], 
-                            'Deletions': [pull.deletions for pull in repo.pull_requests], 
-                            'Changed_files': [pull.changed_files for pull in repo.pull_requests], 
-                            'Author_assoc': [pull.user for pull in repo.pull_requests], 
+                            'State': [pull.state for pull in rep_analyzer.pull_requests], 
+                            'Commits': [pull.commits for pull in rep_analyzer.pull_requests], 
+                            'Additions': [pull.additions for pull in rep_analyzer.pull_requests], 
+                            'Deletions': [pull.deletions for pull in rep_analyzer.pull_requests], 
+                            'Changed_files': [pull.changed_files for pull in rep_analyzer.pull_requests], 
+                            'Author_assoc': [pull.user for pull in rep_analyzer.pull_requests], 
                         }
 
                         # convert to df 
@@ -648,14 +648,14 @@ def main():
                     # Calculate the correlation between all the numeric data in the pull requests for a repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    repo = next((r for r in self.repositories if r.name == repo_name), None)
-                    if repo:
+                    rep_analyzer = rep_analyzers.get((owner, repo_name))
+                    if rep_analyzer:
                         # get all data
                         rep_dat = {
-                            'Commits': [pull.commits for pull in repo.pull_requests], 
-                            'Additions': [pull.additions for pull in repo.pull_requests], 
-                            'Deletions': [pull.deletions for pull in repo.pull_requests], 
-                            'Changed_files': [pull.changed_files for pull in repo.pull_requests],
+                            'Commits': [pull.commits for pull in rep_analyzer.pull_requests], 
+                            'Additions': [pull.additions for pull in rep_analyzer.pull_requests], 
+                            'Deletions': [pull.deletions for pull in rep_analyzer.pull_requests], 
+                            'Changed_files': [pull.changed_files for pull in rep_analyzer.pull_requests],
                         }
 
                         # convert to df 
