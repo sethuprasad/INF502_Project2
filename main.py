@@ -676,13 +676,13 @@ def main():
             # Create and store visual representation data to a data frame for all the repositories
             if rep_analyzers:
                 all_repo_data = []
-                for repo in self.repositories:
+                for (owner, rep), rep_analyzer in rep_analyzers.items():
                     rep_dat = {
-                        'Name': repo.name,
-                        'Num_pulls': len(repo.pull_requests),
-                        'Num_open_pulls': sum(1 for pull in repo.pull_requests if pull.state == 'open'),
-                        'Num_closed_pulls': sum(1 for pull in repo.pull_requests if pull.state == 'closed'),
-                        'Num_users': len(set(pull.user for pull in repo.pull_requests)),
+                        'Name': rep,
+                        'Num_pulls': len(rep_analyzer.pull_requests),
+                        'Num_open_pulls': sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'open'),
+                        'Num_closed_pulls': sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'closed'),
+                        'Num_users': len(set(pull.user for pull in rep_analyzer.pull_requests)),
                     }
                     all_repo_data.append(rep_dat)
                     
@@ -694,6 +694,7 @@ def main():
                 plt.title("Total number of Pull Requests per Repository per Day")
                 plt.xlabel("Repository Name")
                 plt.ylabel("Number of Pull Requests")
+                plt.legend()
                 plt.xticks(rotation=45, ha = 'right')
                 plt.show()
                 
