@@ -724,13 +724,19 @@ def main():
         elif userchoice == '4':
             # Calculate the correlation between the data collected for the users - following, followers, 
             # number of pull requests, number of contributions, etc.
-            if users:
+            if rep_analyzers:
                 user_dat = {
-                    'Following': [user.following for user in users], 
-                    'Followers': [user.followers for user in users], 
-                    'Num_pull' : [len(user.pull_requests) for user in users],     
-                    'Num_contr' : [user.contributions for user in users]}
-                
+                    'Following': [], 
+                    'Followers': [], 
+                    'Num_pull' : [],     
+                    'Num_contr' : []}
+                for rep_analyzer in rep_analyzers.values(): 
+                    for user in rep_analyzer.users:
+                        user_dat['Following'].append(user.following)
+                        user_dat['Followers'].append(user.followers)
+                        user_dat['Num_pull'].append(len(user.pull_requests))
+                        user_dat['Num_contr'].append(user.contributions)
+                        
                 # convert to df 
                 user_df = pd.DataFrame(user_dat)
 
