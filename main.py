@@ -281,7 +281,7 @@ class GitHUbRepAnalyser:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
 
-        user_data = response.json()
+        self.user_data = response.json()
 
         #print("User Dtaa retrived is below : ", user_data)
         #print("Stauscode for the request under collecting user data is : ", response.status_code)
@@ -290,7 +290,7 @@ class GitHUbRepAnalyser:
         #print(response.content)
 
         # Filter contributors by the desired_username
-        user_contributions = [contributor for contributor in user_data if contributor['login'] == username]
+        user_contributions = [contributor for contributor in self.user_data if contributor['login'] == username]
 
         if user_contributions:
             print(f"Details of user {username}:")
@@ -739,12 +739,12 @@ def main():
             # Calculate the correlation between the data collected for the users - following, followers, 
             # number of pull requests, number of contributions, etc.
             # user data needs to be pulled first
-            if users:
+            if rep_analyzer.user_data:
                 user_dat = {
-                    'Following': [user.following for user in users],
-                    'Followers': [user.followers for user in users],
-                    'Num_pull': [len(user.pull_requests) for user in users],
-                    'Num_contr': [user.contributions for user in users]}
+                    'Following': [user.following for user in rep_analyzer.user_data],
+                    'Followers': [user.followers for user in rep_analyzer.user_data],
+                    'Num_pull': [len(user.pull_requests) for user in rep_analyzer.user_data],
+                    'Num_contr': [user.contributions for user in rep_analyzer.user_data]}
                 
                 # convert to df 
                 user_df = pd.DataFrame(user_dat)
