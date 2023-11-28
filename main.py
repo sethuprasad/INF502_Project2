@@ -9,12 +9,10 @@ import requests
 import configparser
 
 
-#Global Variables to carry the frequestly used values
+# Global Variables to carry the frequently used values
 owner_name =""
-repositary_name = ""
+repo_name = ""
 users = []
-
-
 
 class GitHUbRepAnalyser:
 
@@ -94,8 +92,9 @@ class GitHUbRepAnalyser:
         #print(owner, repo_name, description, homepage, License, forks, watchers)
 
         # Print the same in a readable format
-        print(f"The Details of Repository \" {repo_name} \" Owned by {owner} are below")
-        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
+        print()
+        print(f"The details of repository \"{repo_name}\" owned by {owner} are below")
+        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers} \n\t Date collected : {currentDate}")
 
 
 
@@ -496,11 +495,16 @@ import matplotlib.pyplot as plt
 
 # main function with menu 
 def main():
-    global users # declare users as global variable 
-
-    # create instances of the GitHUbRepAnalyser class and User class 
-    rep_analyzer = GitHUbRepAnalyser()
     
+    # declare global variables 
+    global repo_name
+    global owner_name
+    global users 
+
+    # create an instance of the GitHUbRepAnalyser class
+    rep_analyzer = GitHUbRepAnalyser()
+
+    # main menu
     while True:
         print("╔══════════════════════════════════════════════════╗")
         print("║     Welcome to the GitHub Repository Analyser    ║")
@@ -527,18 +531,22 @@ def main():
         if userchoice == '1':
             try:
                 print("Hint: you can get the repository name and owner's username from the top left corner of the GitHub page you are looking at")
-                rep = input("Enter the name of the repository: ") # get repository name
-                owner = input("Enter the username of the repository owner: ") # get owner username 
+                repo_name = input("Enter the name of the repository: ") # get repository name
+                owner_name = input("Enter the username of the repository owner: ") # get owner username 
     
                 # get repository data 
-                rep_analyzer.collect_repository_data(owner, rep)
+                rep_analyzer.collect_repository_data(owner_name, repo_name)
+                
                 # get pull request data 
-                rep_analyzer.collect_pull_requests(owner, rep)
+                print()
+                print(f"Here is a list of pull requests related to the repository {repo_name}: ")
+                rep_analyzer.collect_pull_requests(owner_name, repo_name)
+                
                 # get user data 
-                print("The following are the usernames collected from pull requests: ")
+                print("Here are the usernames collected from list of pull requests: ")
                 print(list(set(users))) 
                 username = input("If you would like to get information about one of these users, enter the username here: ")
-                rep_analyzer.collect_user_data(username, rep)
+                rep_analyzer.collect_user_data(username, repo_name)
             except Exception as e:
                 print(f"An error occurred: {e}")
 
