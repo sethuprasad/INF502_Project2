@@ -84,22 +84,22 @@ class GitHUbRepAnalyser:
         
         description = repo_data.get('description', '')
         homepage = repo_data.get('homepage', '')
-        license = repo_data.get('license', {}).get('name', '')
+        License = repo_data.get('license', {}).get('name', '')
         forks = repo_data.get('forks_count', 0)
         watchers = repo_data.get('watchers_count', 0)
         currentDate = datetime.now()
 
         
-        print(owner, repo_name, description, homepage, license, forks, watchers)
+        print(owner, repo_name, description, homepage, License, forks, watchers)
 
         #Pring the same in a readable format
         print(f"The Details of Repository \" {repo_name} \" Owned by {owner} are below")
-        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {license} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
+        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
 
 
 
         # Creating object for Repositary class to store the required details fetched 
-        repoData_obj = Repository(owner, repo_name, description, homepage, license, forks, watchers)
+        repoData_obj = Repository(owner, repo_name, description, homepage, License, forks, watchers)
         self.repositories.append(repoData_obj)
 
         #to check the values being passed - personal self validation 
@@ -393,7 +393,7 @@ class Repository:
         self.name = name
         self.description = description
         self.homepage = homepage
-        self.license = license
+        self.License = License
         self.forks = forks
         self.watchers = watchers
         self.pull_requests = []
@@ -403,11 +403,11 @@ class Repository:
         return "owner,name,description,homepage,license,forks,watchers"
 
     def to_CSV(self):
-        return f"{self.owner},{self.name},{self.description},{self.homepage},{self.license},{self.forks},{self.watchers}"
+        return f"{self.owner},{self.name},{self.description},{self.homepage},{self.License},{self.forks},{self.watchers}"
 
     def check(self):
         print("values in repository class")
-        print(f"{self.owner},{self.name},{self.description},{self.homepage},{self.license},{self.forks},{self.watchers}")
+        print(f"{self.owner},{self.name},{self.description},{self.homepage},{self.License},{self.forks},{self.watchers}")
 
 
 class PullRequest:
