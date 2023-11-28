@@ -298,7 +298,7 @@ class GitHUbRepAnalyser:
 
         if user_contributions:
             print(f"Details of user {username}:")
-            print(user_contributions[0])  # Prints the details of user
+            #print(user_contributions[0])  # Prints the details of user
         else:
             print(f"Given User {username} is inactive among the contributors. Please try with different user name")
             username = input("If you would like to get information about one of these users, enter the username here: ")
@@ -500,19 +500,37 @@ import matplotlib.pyplot as plt
 def main():
     global users # declare users as global variable 
 
-    # I updated this variable to a dictionary that stores the owner and repo name as a tuple
-    # create Dictionary for the different repositories passed  
-    rep_analyzers = {}
+    # create instances of the GitHUbRepAnalyser class and User class 
+    rep_analyzer = GitHUbRepAnalyser()
     
     while True:
-        print("\nWelcome to the *APP NAME?* application. \nThis is the main menu; please select one of the following options.\n")
+        '''print("\nWelcome to the *GIT HUB Repository analyser* application. \nThis is the main menu; please select one of the following options.\n")
         print("1. Collect data for a specific GitHub repository")
         print("2. Show all repositories collected")
         print("3. Create and store visual representation data about all the repositories")
         print("4. Calculate the correlation between the data collected for the users")
+        print("5. To Exit")'''
+
+        print("╔══════════════════════════════════════════════════╗")
+        print("║     Welcome to the GIT HUB Repository Analyser   ║")
+        print("╠══════════════════════════════════════════════════╣")
+        print("║ This is the main menu : please select an option  ║")
+        print("║                                                  ║")
+        print("║ 1. Collect data for a specific GitHub repository ║")
+        print("║                                                  ║")
+        print("║ 2. Show all collected repositories               ║")
+        print("║                                                  ║")
+        print("║ 3. Create and store visual representation of data║")
+        print("║    for all repositories                          ║")
+        print("║                                                  ║")
+        print("║ 4. Calculate correlation between collected       ║")
+        print("║     user data                                    ║")
+        print("║                                                  ║")
+        print("║ 5. Exit                                          ║")
+        print("╚══════════════════════════════════════════════════╝")
 
         # get user input 
-        userchoice= input("Enter your choice: ")
+        userchoice= input("Enter your choice : ")
     
         # Collect data from a specific GitHub repository using owner and repository name 
         if userchoice == '1':
@@ -520,10 +538,6 @@ def main():
                 print("Hint: you can get the owner and repository name from the top left corner of the GitHub page you are looking at")
                 rep = input("Enter the name of the repository: ") # get repository name
                 owner = input("Enter the name of the repository owner: ") # get owner name 
-                
-                # Create instance for repository and store
-                rep_analyzer = GitHUbRepAnalyser()
-                rep_analyzers[(owner,rep)] = rep_analyzer
     
                 # get repository data 
                 rep_analyzer.collect_repository_data(owner, rep)
@@ -540,8 +554,8 @@ def main():
         # Show all repositories collected (with submenu of actions possible on each repo)
         elif userchoice == '2':
             # show all repositories collected 
-            for (owner, rep), rep_analyzer in rep_analyzer.items():
-                print(f"Repository: {rep}, Owner: {owner}")
+            for rep in rep_analyzer.repositories:
+                print(rep.name)
             while True:
                 # submenu options
                 print("\nPlease select one of the following submenu options: ")
@@ -557,11 +571,11 @@ def main():
                 if userchoice_sub == '1':
                     # Show all pull requests from a certain repository
                     repo_name = input("Enter the name of repository: ") 
-                    # locate the repository using name
-                    rep_analyzer = rep_analyzers.get((owner, repo_name))
-                    if rep_analyzer:
+                    # locate the repository using name 
+                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    if repo:
                         # print each pull request number and title
-                        for pull in rep_analyzer.pull_requests:
+                        for pull in repo.pull_requests:
                             print(f"Pull request {pull.number}, {pull.title}") 
                     else:
                         print(f"Repository '{repo_name}' not found.")
@@ -570,16 +584,16 @@ def main():
                     # Show the summary of a repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    rep_analyzer = rep_analyzers.get((owner, repo_name))
-                    if rep_analyzer:
+                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    if repo:
                         # Number of pull requests in `open` state
-                        num_open = sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'open')
+                        num_open = sum(1 for pull in repo.pull_requests if pull.state == 'open')
                         # Number of pull requests in `closed` state
-                        num_close = sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'closed')
+                        num_close = sum(1 for pull in repo.pull_requests if pull.state == 'closed')
                         # Number of users
-                        num_users = len(set(pull.user for pull in rep_analyzer.pull_requests))
+                        num_users = len(set(pull.user for pull in repo.pull_requests))
                         # Date of the oldest pull request
-                        old_date = min(pull.created_at for pull in rep_analyzer.pull_requests)
+                        old_date = min(pull.created_at for pull in repo.pull_requests)                        
                     else:
                         print(f"Repository '{repo_name}' not found.")    
                         
@@ -593,17 +607,17 @@ def main():
                 elif userchoice_sub == '3':
                     # Create and store visual representation data about the repository
                     repo_name = input("Enter the name of repository: ") 
-                    # locate the repository using name
-                    rep_analyzer = rep_analyzers.get((owner, repo_name))
-                    if rep_analyzer:
+                    # locate the repository using name 
+                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    if repo:
                         # get all data
                         rep_dat = {
-                            'State': [pull.state for pull in rep_analyzer.pull_requests], 
-                            'Commits': [pull.commits for pull in rep_analyzer.pull_requests], 
-                            'Additions': [pull.additions for pull in rep_analyzer.pull_requests], 
-                            'Deletions': [pull.deletions for pull in rep_analyzer.pull_requests], 
-                            'Changed_files': [pull.changed_files for pull in rep_analyzer.pull_requests], 
-                            'Author_assoc': [pull.user for pull in rep_analyzer.pull_requests], 
+                            'State': [pull.state for pull in repo.pull_requests], 
+                            'Commits': [pull.commits for pull in repo.pull_requests], 
+                            'Additions': [pull.additions for pull in repo.pull_requests], 
+                            'Deletions': [pull.deletions for pull in repo.pull_requests], 
+                            'Changed_files': [pull.changed_files for pull in repo.pull_requests], 
+                            'Author_assoc': [pull.user for pull in repo.pull_requests], 
                         }
 
                         # convert to df 
@@ -649,14 +663,14 @@ def main():
                     # Calculate the correlation between all the numeric data in the pull requests for a repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    rep_analyzer = rep_analyzers.get((owner, repo_name))
-                    if rep_analyzer:
+                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    if repo:
                         # get all data
                         rep_dat = {
-                            'Commits': [pull.commits for pull in rep_analyzer.pull_requests], 
-                            'Additions': [pull.additions for pull in rep_analyzer.pull_requests], 
-                            'Deletions': [pull.deletions for pull in rep_analyzer.pull_requests], 
-                            'Changed_files': [pull.changed_files for pull in rep_analyzer.pull_requests],
+                            'Commits': [pull.commits for pull in repo.pull_requests], 
+                            'Additions': [pull.additions for pull in repo.pull_requests], 
+                            'Deletions': [pull.deletions for pull in repo.pull_requests], 
+                            'Changed_files': [pull.changed_files for pull in repo.pull_requests],
                         }
 
                         # convert to df 
@@ -675,15 +689,15 @@ def main():
 
         elif userchoice == '3':
             # Create and store visual representation data to a data frame for all the repositories
-            if rep_analyzers:
+            if rep_analyzer.repositories:
                 all_repo_data = []
-                for (owner, rep), rep_analyzer in rep_analyzers.items():
+                for repo in rep_analyzer.repositories:
                     rep_dat = {
-                        'Name': rep,
-                        'Num_pulls': len(rep_analyzer.pull_requests),
-                        'Num_open_pulls': sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'open'),
-                        'Num_closed_pulls': sum(1 for pull in rep_analyzer.pull_requests if pull.state == 'closed'),
-                        'Num_users': len(set(pull.user for pull in rep_analyzer.pull_requests)),
+                        'Name': repo.name,
+                        'Num_pulls': len(repo.pull_requests),
+                        'Num_open_pulls': sum(1 for pull in repo.pull_requests if pull.state == 'open'),
+                        'Num_closed_pulls': sum(1 for pull in repo.pull_requests if pull.state == 'closed'),
+                        'Num_users': len(set(pull.user for pull in repo.pull_requests)),
                     }
                     all_repo_data.append(rep_dat)
                     
@@ -695,7 +709,6 @@ def main():
                 plt.title("Total number of Pull Requests per Repository per Day")
                 plt.xlabel("Repository Name")
                 plt.ylabel("Number of Pull Requests")
-                plt.legend()
                 plt.xticks(rotation=45, ha = 'right')
                 plt.show()
                 
@@ -725,19 +738,13 @@ def main():
         elif userchoice == '4':
             # Calculate the correlation between the data collected for the users - following, followers, 
             # number of pull requests, number of contributions, etc.
-            if rep_analyzers:
+            if users:
                 user_dat = {
-                    'Following': [], 
-                    'Followers': [], 
-                    'Num_pull' : [],     
-                    'Num_contr' : []}
-                for rep_analyzer in rep_analyzers.values(): 
-                    for user in rep_analyzer.users:
-                        user_dat['Following'].append(user.following)
-                        user_dat['Followers'].append(user.followers)
-                        user_dat['Num_pull'].append(len(user.pull_requests))
-                        user_dat['Num_contr'].append(user.contributions)
-                        
+                    'Following': [user.following for user in users], 
+                    'Followers': [user.followers for user in users], 
+                    'Num_pull' : [len(user.pull_requests) for user in users],     
+                    'Num_contr' : [user.contributions for user in users]}
+                
                 # convert to df 
                 user_df = pd.DataFrame(user_dat)
 
@@ -755,6 +762,9 @@ def main():
         else:
             print("\nPLEASE SELECT A VALID OPTION\n")
         
-  
+        
+
+
+
 
 main()
