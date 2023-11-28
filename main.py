@@ -94,7 +94,7 @@ class GitHUbRepAnalyser:
 
         #Pring the same in a readable format
         print(f"The Details of Repository \" {repo_name} \" Owned by {owner} are below")
-        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
+        print(f"\t Description : {description} \n\t HomePage : {homepage if homepage is not None else 'None'} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
 
 
 
