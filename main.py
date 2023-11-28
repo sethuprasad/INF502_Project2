@@ -93,7 +93,7 @@ class GitHUbRepAnalyser:
 
         # Print the same in a readable format
         print()
-        print(f"The details of repository \"{repo_name}\" owned by {owner} are below")
+        print(f"The details for repository \"{repo_name}\" owned by {owner} are below")
         print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers} \n\t Date collected : {currentDate}")
 
 
@@ -130,7 +130,7 @@ class GitHUbRepAnalyser:
         #print("Total Pull requests fetched :", len(pull_request_data))
 
         #user response
-        decision = input("If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N)")
+        decision = input("We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
         every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
         #PullRequest objects corresponding repository details
@@ -539,20 +539,22 @@ def main():
                 
                 # get pull request data 
                 print()
-                print(f"Here is a list of pull requests related to the repository {repo_name}: ")
                 rep_analyzer.collect_pull_requests(owner_name, repo_name)
                 
                 # get user data 
+                print()
                 print("Here are the usernames collected from list of pull requests: ")
                 print(list(set(users))) 
+                print()
                 username = input("If you would like to get information about one of these users, enter the username here: ")
-                rep_analyzer.collect_user_data(username, repo_name)
+                rep_analyzer.collect_user_data(str(username), repo_name)
             except Exception as e:
                 print(f"An error occurred: {e}")
 
         # Show all repositories collected (with submenu of actions possible on each repo)
         elif userchoice == '2':
             # show all repositories collected 
+            print("Here are all of the collected repositories: ")
             for rep in rep_analyzer.repositories:
                 print(rep.name)
             while True:
