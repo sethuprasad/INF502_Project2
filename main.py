@@ -83,22 +83,23 @@ class GitHUbRepAnalyser:
 
         
         description = repo_data.get('description', '')
-        homepage = repo_data.get('homepage', '')
-        License = repo_data.get('license', {}).get('name', '')
+        homepage = repo_data['homepage'] if 'homepage' in repo_data and repo_data['homepage'] != '' else 'None'
+        repo_license = repo_data.get('license')
+        License = repo_license['name'] if repo_license and repo_license['name'] is not None else 'None'
         forks = repo_data.get('forks_count', 0)
         watchers = repo_data.get('watchers_count', 0)
         currentDate = datetime.now()
 
         
-        print(owner, repo_name, description, homepage, License, forks, watchers)
+        #print(owner, repo_name, description, homepage, License, forks, watchers)
 
-        #Pring the same in a readable format
+        # Print the same in a readable format
         print(f"The Details of Repository \" {repo_name} \" Owned by {owner} are below")
-        print(f"\t Description : {description} \n\t HomePage : {homepage if homepage is not None else 'None'} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
+        print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers}, \n\t Date collected : {currentDate}")
 
 
 
-        # Creating object for Repositary class to store the required details fetched 
+        # Creating object for Repository class to store the required details fetched 
         repoData_obj = Repository(owner, repo_name, description, homepage, License, forks, watchers)
         self.repositories.append(repoData_obj)
 
@@ -115,7 +116,7 @@ class GitHUbRepAnalyser:
 
         #Validating the Response Status code 
         if response.status_code == 200:
-            print(" Pull Request - Request Successful - Ok : ", response.status_code)
+            print("Pull Request - Request Successful - Ok : ", response.status_code)
         else:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
@@ -124,17 +125,14 @@ class GitHUbRepAnalyser:
         pull_request_data = response.json().get('items', [])
 
         #print("Pull Request data is : ")
-       # print(pull_request_data) 
+        #print(pull_request_data) 
 
         #To be commented
         #print("Total Pull requests fetched :", len(pull_request_data))
-        
-
-        
 
         #user response
-        decision = input("If you would like to access only First page of Pull Requests press(Y) or Press(N) for accessing all the pages of Pull Request : ")
-        every_Page_Response = input(" Would you like to receive a notification to proceed before moving to every new page Y/N : ")
+        decision = input("If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N)")
+        every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
         #PullRequest objects corresponding repository details
         if(decision.lower() == 'y'):
@@ -155,7 +153,7 @@ class GitHUbRepAnalyser:
                     print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
                     count += 1
                 elif(count == 5):
-                    print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                    print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
                     count += 1
             
 
@@ -185,7 +183,7 @@ class GitHUbRepAnalyser:
                     print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
                     count += 1
                 elif(count == 5):
-                    print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                    print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
                     count += 1
             
 
@@ -388,7 +386,7 @@ class GitHUbRepAnalyser:
 
 
 class Repository:
-    def __init__(self, owner, name, description, homepage, license, forks, watchers):
+    def __init__(self, owner, name, description, homepage, License, forks, watchers):
         self.owner = owner
         self.name = name
         self.description = description
@@ -505,7 +503,7 @@ def main():
     
     while True:
         print("╔══════════════════════════════════════════════════╗")
-        print("║     Welcome to the GitHub Repository Analyser   ║")
+        print("║     Welcome to the GitHub Repository Analyser    ║")
         print("╠══════════════════════════════════════════════════╣")
         print("║ This is the main menu : Please select an option  ║")
         print("║                                                  ║")
