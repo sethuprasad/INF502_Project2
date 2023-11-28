@@ -504,17 +504,10 @@ def main():
     rep_analyzer = GitHUbRepAnalyser()
     
     while True:
-        '''print("\nWelcome to the *GIT HUB Repository analyser* application. \nThis is the main menu; please select one of the following options.\n")
-        print("1. Collect data for a specific GitHub repository")
-        print("2. Show all repositories collected")
-        print("3. Create and store visual representation data about all the repositories")
-        print("4. Calculate the correlation between the data collected for the users")
-        print("5. To Exit")'''
-
         print("╔══════════════════════════════════════════════════╗")
-        print("║     Welcome to the GIT HUB Repository Analyser   ║")
+        print("║     Welcome to the GitHub Repository Analyser   ║")
         print("╠══════════════════════════════════════════════════╣")
-        print("║ This is the main menu : please select an option  ║")
+        print("║ This is the main menu : Please select an option  ║")
         print("║                                                  ║")
         print("║ 1. Collect data for a specific GitHub repository ║")
         print("║                                                  ║")
@@ -530,14 +523,14 @@ def main():
         print("╚══════════════════════════════════════════════════╝")
 
         # get user input 
-        userchoice= input("Enter your choice : ")
+        userchoice = input("Enter your choice : ")
     
-        # Collect data from a specific GitHub repository using owner and repository name 
+        # Collect data from a specific GitHub repository using owner username and repository name 
         if userchoice == '1':
             try:
-                print("Hint: you can get the owner and repository name from the top left corner of the GitHub page you are looking at")
+                print("Hint: you can get the repository name and owner's username from the top left corner of the GitHub page you are looking at")
                 rep = input("Enter the name of the repository: ") # get repository name
-                owner = input("Enter the name of the repository owner: ") # get owner name 
+                owner = input("Enter the username of the repository owner: ") # get owner username 
     
                 # get repository data 
                 rep_analyzer.collect_repository_data(owner, rep)
