@@ -247,7 +247,7 @@ class GitHUbRepAnalyser:
                     print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
                     count += 1
                 elif(count == 5):
-                    print("If you want all the pull request details please, visit PullRequests.csv file in current directory/Folder.")
+                    print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
                     count += 1
             
 
