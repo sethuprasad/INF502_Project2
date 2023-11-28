@@ -120,8 +120,7 @@ class GitHUbRepAnalyser:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
    
-
-        pull_request_data = response.json().get('items', [])
+        self.pull_request_data = response.json().get('items')
 
         #print("Pull Request data is : ")
         #print(pull_request_data) 
@@ -130,13 +129,13 @@ class GitHUbRepAnalyser:
         #print("Total Pull requests fetched :", len(pull_request_data))
 
         #user response
-        decision = input("We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
+        decision = input(f"We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
         every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
         #PullRequest objects corresponding repository details
         if(decision.lower() == 'y'):
 
-            self.print_PullRequestsData(pull_request_data, owner, repo_name)
+            self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
 
             ''' for pr in pull_request_data:
                 title = pr.get('title', '')
@@ -167,7 +166,7 @@ class GitHUbRepAnalyser:
                     repo.pull_requests.append(pull_request)'''
 
         elif(decision.lower() == 'n'):
-            self.print_PullRequestsData(pull_request_data, owner, repo_name)
+            self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
             '''for pr in pull_request_data:
                 title = pr.get('title', '')
                 number = pr.get('number', '')
@@ -739,12 +738,13 @@ def main():
         elif userchoice == '4':
             # Calculate the correlation between the data collected for the users - following, followers, 
             # number of pull requests, number of contributions, etc.
+            # user data needs to be pulled first
             if users:
                 user_dat = {
-                    'Following': [user.following for user in users], 
-                    'Followers': [user.followers for user in users], 
-                    'Num_pull' : [len(user.pull_requests) for user in users],     
-                    'Num_contr' : [user.contributions for user in users]}
+                    'Following': [user.following for user in users],
+                    'Followers': [user.followers for user in users],
+                    'Num_pull': [len(user.pull_requests) for user in users],
+                    'Num_contr': [user.contributions for user in users]}
                 
                 # convert to df 
                 user_df = pd.DataFrame(user_dat)
