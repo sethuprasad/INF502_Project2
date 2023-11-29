@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 owner_name =""
 repo_name = ""
 users = []
+ContributorDetailsRequByUser = []
+repositoryAndOwner = {}
 
 class GitHUbRepAnalyser:
 
@@ -241,7 +243,7 @@ class GitHUbRepAnalyser:
 
         user = User(username, repos_count, followers_count, following_count, contributions_lastYear)
 
-        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\nFollowing : ", following_count, "\nContributions in last year : ", contributions_lastYear, "\nTotal Contributions : ",TotalContribution,  )
+        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\n3Following : ", following_count, "\nContributions in last year : ", contributions_lastYear, "\nTotal Contributions : ",TotalContribution,  )
         self.save_as_csv('users1.csv', user)
 
     def scrape_user_contributions(self, username):
@@ -333,6 +335,8 @@ def main():
     global repo_name
     global owner_name
     global users 
+    global ContributorDetailsRequByUser
+    global repositoryAndOwner
 
     # create an instance of the GitHUbRepAnalyser class
     rep_analyzer = GitHUbRepAnalyser()
@@ -366,7 +370,21 @@ def main():
                 print("Hint: you can get the repository name and owner's username from the top left corner of the GitHub page you are looking at")
                 repo_name = input("Enter the name of the repository: ") # get repository name
                 owner_name = input("Enter the username of the repository owner: ") # get owner username 
-    
+
+                if owner_name in repositoryAndOwner and repositoryAndOwner[owner_name] == repo_name:
+                    print(f"You have already collected the required data for the given repository : {repo_name} with Owner : {owner_name}")
+                    user_decision = input("if you would like to continue with the same press ( 'C'- continue ) else press 'N' to enter different repository details : ")
+                    if user_decision.lower() == 'c':
+                        continue
+                    elif user_decision.lower() == 'n':
+                        repo_name = input("Enter the name of the repository: ") 
+                        owner_name = input("Enter the username of the repository owner: ")
+                        if owner_name in repositoryAndOwner and repositoryAndOwner[owner_name] == repo_name:
+                            print("Sorry..!, returning to Main Menu. Please find a new repositoty to explore further")
+                            break
+                else:
+                    repositoryAndOwner.update({owner_name : repo_name})
+
                 # get repository data 
                 rep_analyzer.collect_repository_data(owner_name, repo_name)
                 
@@ -379,8 +397,21 @@ def main():
                 print("Here are the usernames collected from list of pull requests: ")
                 print(list(set(users))) 
                 print()
-                username = input("If you would like to get information about one of these users, enter the username here: ")
-                rep_analyzer.collect_user_data(str(username), repo_name)
+                #username = input("If you would like to get information about one of these users, enter the username here: ")
+                while True:
+                    username = input("If you would like to get information about one of these users, enter the username here: ")
+                    if username not in ContributorDetailsRequByUser:
+                        ContributorDetailsRequByUser.append(username)
+                        rep_analyzer.collect_user_data(str(username), repo_name)
+                    else:
+                        print(f"You have already collected the required details of the user : {username}")
+
+                    decision1 = input("Would you like to continue with a different user Y/N ?")
+                    if decision1.lower() == 'y':
+                        continue
+                    else:
+                        break
+                    
             except Exception as e:
                 print(f"An error occurred: {e}")
 
