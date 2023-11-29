@@ -6,13 +6,16 @@ from datetime import datetime
 import os
 from bs4 import BeautifulSoup
 import requests
-import configparser
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 # Global Variables to carry the frequently used values
 owner_name =""
 repo_name = ""
 users = []
+ContributorDetailsRequByUser = []
+repositoryAndOwner = {}
 
 class GitHUbRepAnalyser:
 
@@ -20,44 +23,16 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
-       tokenValue = ''.join(tokenChunks)
-       '''with open("secret/secret.txt") as secret:
+       #tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
+       #tokenValue = ''.join(tokenChunks)
+       with open("secret/secret.txt") as secret:
           tokenValue = secret.readlines()[0]
-       config = configparser.ConfigParser()
-       config.read('config.ini')'''
 
-       #print(os.environ.get('GITHUB_TOKEN'))
-       #print(config['GitHub']['token'])
        self.access_token = tokenValue
        self.headers = {
             'Authorization': f'token {self.access_token}',
             'Accept': 'application/vnd.github.v3+json'
        }
-
-    '''
-   #alternate code to get the required details from the content received
-    def __init__(self, repo_name):
-        self.repo_name = repo_name
-        self.g = Github()
-        self.repo = self.g.get_repo(repo_name)
-        self.repositories = []
-    #alternate code to get the required details from the content received
-    def get_details(self):
-        details = {}
-        details['name'] = self.repo.name
-        details['description'] = self.repo.description
-        details['url'] = self.repo.html_url
-        details['created_at'] = self.repo.created_at.strftime('%Y-%m-%d %H:%M:%S')
-        details['updated_at'] = self.repo.updated_at.strftime('%Y-%m-%d %H:%M:%S')
-        details['language'] = self.repo.language
-        details['forks'] = self.repo.forks_count
-        details['stars'] = self.repo.stargazers_count
-        details['watchers'] = self.repo.watchers_count
-        details['open_issues'] = self.repo.open_issues_count
-        return details
-   
-    '''   
 
     def collect_repository_data(self, owner, repo_name):
         # Using GitHub API to collect repository data
@@ -87,7 +62,6 @@ class GitHUbRepAnalyser:
         forks = repo_data.get('forks_count', 0)
         watchers = repo_data.get('watchers_count', 0)
         currentDate = datetime.now()
-
         
         #print(owner, repo_name, description, homepage, License, forks, watchers)
 
@@ -101,9 +75,6 @@ class GitHUbRepAnalyser:
         # Creating object for Repository class to store the required details fetched 
         repoData_obj = Repository(owner, repo_name, description, homepage, License, forks, watchers)
         self.repositories.append(repoData_obj)
-
-        #to check the values being passed - personal self validation 
-        #repoData_obj.check()
 
     
     def collect_pull_requests(self, owner, repo_name):
@@ -125,75 +96,17 @@ class GitHUbRepAnalyser:
         #print("Pull Request data is : ")
         #print(pull_request_data) 
 
-        #To be commented
-        #print("Total Pull requests fetched :", len(pull_request_data))
-
         #user response
         decision = input(f"We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
-        every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
+        if decision.lower() == 'n':
+            every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
         #PullRequest objects corresponding repository details
         if(decision.lower() == 'y'):
-
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
-
-            ''' for pr in pull_request_data:
-                title = pr.get('title', '')
-                number = pr.get('number', '')
-                body = pr.get('body', '')
-                state = pr.get('state', '')
-                created_at = pr.get('created_at', '')
-                closed_at = pr.get('closed_at', '')
-                user = pr.get('user', {}).get('login', '')
-
-                if(count < 5):
-                    print(f"The Details of PR : {number} are :")
-                    print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
-                    count += 1
-                elif(count == 5):
-                    print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
-                    count += 1
-            
-
-                # Additional query to get details like commits, additions, deletions, changed_files
-                pr_details = self.get_pull_request_details(owner, repo_name, number)
-
-                # creating obj for PullRequest class  
-                pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
-                #self.save_as_csv('PullRequests.csv', pull_request)
-                repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
-                if repo:
-                    repo.pull_requests.append(pull_request)'''
 
         elif(decision.lower() == 'n'):
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
-            '''for pr in pull_request_data:
-                title = pr.get('title', '')
-                number = pr.get('number', '')
-                body = pr.get('body', '')
-                state = pr.get('state', '')
-                created_at = pr.get('created_at', '')
-                closed_at = pr.get('closed_at', '')
-                user = pr.get('user', {}).get('login', '')
-
-                if(count < 5):
-                    print(f"The Details of PR : {number} are :")
-                    print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
-                    count += 1
-                elif(count == 5):
-                    print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
-                    count += 1
-            
-
-                # Additional query to get details like commits, additions, deletions, changed_files
-                pr_details = self.get_pull_request_details(owner, repo_name, number)
-
-                # creating obj for PullRequest class  
-                pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
-                #self.save_as_csv('PullRequests.csv', pull_request)
-                repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
-                if repo:
-                    repo.pull_requests.append(pull_request)'''
 
             while 'next' in response.links:
                 next_page_url = response.links['next']['url']
@@ -241,10 +154,11 @@ class GitHUbRepAnalyser:
                 user = pr.get('user', {}).get('login', '')
 
                 if(count < 5):
-                    print("\n","*"*50)
+                    print("\n","*"*100)
                     print(f"The Details of PR : {number} are :")
                     print(f"\t Title : {title} \n\t Body : {body} \n\t State : {state} \n\t Created : {created_at} \n\t Closed : {closed_at} \n\t User : {user}")
                     count += 1
+                    print("\n","═"*100)
                 elif(count == 5):
                     print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
                     count += 1
@@ -281,7 +195,7 @@ class GitHUbRepAnalyser:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
 
-        user_data = response.json()
+        self.user_data = response.json()
 
         #print("User Dtaa retrived is below : ", user_data)
         #print("Stauscode for the request under collecting user data is : ", response.status_code)
@@ -290,7 +204,7 @@ class GitHUbRepAnalyser:
         #print(response.content)
 
         # Filter contributors by the desired_username
-        user_contributions = [contributor for contributor in user_data if contributor['login'] == username]
+        user_contributions = [contributor for contributor in self.user_data if contributor['login'] == username]
 
         if user_contributions:
             print(f"Details of user {username}:")
@@ -300,28 +214,6 @@ class GitHUbRepAnalyser:
             username = input("If you would like to get information about one of these users, enter the username here: ")
             self.collect_user_data(username, repo_name)      
 
-
-        '''if isinstance(user_data, list) and user_data:
-            # Check if user_data is a non-empty list
-            first_user = user_data[0]  # Access the first user's data
-            repositories = first_user.get('public_repos', 0)
-            followers = first_user.get('followers', 0)
-            following = first_user.get('following', 0)
-            contributions = self.scrape_user_contributions(username)
-            
-        else:
-            #Yet to implement Try catch for this issue
-            print("Invlid format of accessing the data")'''
-        
-
-        specific_User_data = user_contributions[0]
-        # Extracting relevant information
-        '''repositories = specific_User_data.get('public_repos', 0)
-        followers = specific_User_data.get('followers', 0)
-        following = specific_User_data.get('following', 0)
-        UserCOntibutions = specific_User_data.get('contributions', 0)
-        contributions = self.scrape_user_contributions(username)
-        #contributions = ""'''
 
         followers_url = f'https://api.github.com/users/{username}/followers'
         following_url = f'https://api.github.com/users/{username}/following'
@@ -351,7 +243,7 @@ class GitHUbRepAnalyser:
 
         user = User(username, repos_count, followers_count, following_count, contributions_lastYear)
 
-        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\n repositories : ", repos_count, "\nFollowers : ", followers_count, "\n Following : ", following_count, "\nContributions in last year : ", contributions_lastYear, "\nTotal Contributions : ",TotalContribution,  )
+        print(f"Details of user : {username} in repository {repo_name} are : ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\n3Following : ", following_count, "\nContributions in last year : ", contributions_lastYear, "\nTotal Contributions : ",TotalContribution,  )
         self.save_as_csv('users1.csv', user)
 
     def scrape_user_contributions(self, username):
@@ -378,10 +270,6 @@ class GitHUbRepAnalyser:
             file.write(obj.to_csv() + '\n')
 
    
-#repo = GitHUbRepAnalyser('google/jax')
-#details = repo.get_details()
-#print(details)
-
 
 class Repository:
     def __init__(self, owner, name, description, homepage, License, forks, watchers):
@@ -438,59 +326,7 @@ class User:
 
 
 
-#def main():
-#   global users
-#   print(" Choose one of the bleow options to start exploring & analysing the Repository")
-#   print("1. If you would like to specify the names of Owner & the repository")
-#   print("2. If you would like to provide details in below format owner/repository")
-#   print("Hint: you get the above deatails from top left corner of the github page you are looking")
-   
-#   choice = int(input("Enter your choice of input format"))
-#   if choice == 1:
-#      owner_name = input("Please Enter the Owner name : ")
-#      repositary_name = input("Please Enter the Repositary name : ")
-#   elif choice == 2:
-#      repositoryValue = input("Please, Specify the repository path in 'owner/repository' format : ")
-#      values = repositoryValue.split('/')
-#      owner_name = values[0]
-#      repositary_name = values[1]
-
-#   ''' #check the rate linit for the github access 
-#   url = f'https://api.github.com/repos/{owner_name}/{repositary_name}/rate_limit'
-#   headers = {'Authorization': 'token YOUR-OAUTH-TOKEN'}
-#   response = requests.get(url, headers=headers)
-
-#    # Print the rate limit information
-#   print("Rate of limit is : \n",response.json())'''
-
-#   repositoryAnalyser_obj = GitHUbRepAnalyser()
-#   repositoryAnalyser_obj.collect_repository_data(owner_name, repositary_name)
-#   repositoryAnalyser_obj.collect_pull_requests(owner_name, repositary_name)
-   
-#   #Code to display the list of uses that are gathered from pull requests
-#   '''url = f'https://api.github.com/users'
-#   response = requests.get(url)
-#   user_data = response.json()
-#   print("User Data is : \n")
-
-#   print(user_data)'''
-
-#   print("Below are the list of User Names  : \n ")
-#   new_names = list(set(users))
-#   print(new_names)
-
-#   #To the user name as input to collect the details
-#   UserName_to_collectDetails = input("Enter the User name from the above list that you are interested in collect the details :  ")
-#   repositoryAnalyser_obj.collect_user_data(UserName_to_collectDetails, repositary_name)
-
-
-
 ### MAIN MENU ### 
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# should make some of these in functions in the GitHUbRepAnalyser Class
-# need to add pull requests to Users class 
 
 # main function with menu 
 def main():
@@ -499,6 +335,8 @@ def main():
     global repo_name
     global owner_name
     global users 
+    global ContributorDetailsRequByUser
+    global repositoryAndOwner
 
     # create an instance of the GitHUbRepAnalyser class
     rep_analyzer = GitHUbRepAnalyser()
@@ -532,7 +370,21 @@ def main():
                 print("Hint: you can get the repository name and owner's username from the top left corner of the GitHub page you are looking at")
                 repo_name = input("Enter the name of the repository: ") # get repository name
                 owner_name = input("Enter the username of the repository owner: ") # get owner username 
-    
+
+                if owner_name in repositoryAndOwner and repositoryAndOwner[owner_name] == repo_name:
+                    print(f"You have already collected the required data for the given repository : {repo_name} with Owner : {owner_name}")
+                    user_decision = input("if you would like to continue with the same press ( 'C'- continue ) else press 'N' to enter different repository details : ")
+                    if user_decision.lower() == 'c':
+                        continue
+                    elif user_decision.lower() == 'n':
+                        repo_name = input("Enter the name of the repository: ") 
+                        owner_name = input("Enter the username of the repository owner: ")
+                        if owner_name in repositoryAndOwner and repositoryAndOwner[owner_name] == repo_name:
+                            print("Sorry..!, returning to Main Menu. Please find a new repositoty to explore further")
+                            break
+                else:
+                    repositoryAndOwner.update({owner_name : repo_name})
+
                 # get repository data 
                 rep_analyzer.collect_repository_data(owner_name, repo_name)
                 
@@ -545,8 +397,21 @@ def main():
                 print("Here are the usernames collected from list of pull requests: ")
                 print(list(set(users))) 
                 print()
-                username = input("If you would like to get information about one of these users, enter the username here: ")
-                rep_analyzer.collect_user_data(str(username), repo_name)
+                #username = input("If you would like to get information about one of these users, enter the username here: ")
+                while True:
+                    username = input("If you would like to get information about one of these users, enter the username here: ")
+                    if username not in ContributorDetailsRequByUser:
+                        ContributorDetailsRequByUser.append(username)
+                        rep_analyzer.collect_user_data(str(username), repo_name)
+                    else:
+                        print(f"You have already collected the required details of the user : {username}")
+
+                    decision1 = input("Would you like to continue with a different user Y/N ?")
+                    if decision1.lower() == 'y':
+                        continue
+                    else:
+                        break
+                    
             except Exception as e:
                 print(f"An error occurred: {e}")
 
@@ -739,12 +604,12 @@ def main():
             # Calculate the correlation between the data collected for the users - following, followers, 
             # number of pull requests, number of contributions, etc.
             # user data needs to be pulled first
-            if users:
+            if rep_analyzer.user_data:
                 user_dat = {
-                    'Following': [user.following for user in users],
-                    'Followers': [user.followers for user in users],
-                    'Num_pull': [len(user.pull_requests) for user in users],
-                    'Num_contr': [user.contributions for user in users]}
+                    'Following': [user.following for user in rep_analyzer.user_data],
+                    'Followers': [user.followers for user in rep_analyzer.user_data],
+                    'Num_pull': [len(user.pull_requests) for user in rep_analyzer.user_data],
+                    'Num_contr': [user.contributions for user in rep_analyzer.user_data]}
                 
                 # convert to df 
                 user_df = pd.DataFrame(user_dat)
@@ -763,9 +628,6 @@ def main():
         else:
             print("\nPLEASE SELECT A VALID OPTION\n")
         
-        
-
-
 
 
 main()
