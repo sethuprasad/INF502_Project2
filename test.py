@@ -6,4 +6,8 @@ class MainTests(TestCase):
     pass
 
     def test_basic(self):
-        pass
+        
+        repo_name = 'INF502_Tests'
+        user = 'Clockwork-Rat'
+
+        
