@@ -23,8 +23,8 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       #tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
-       #tokenValue = ''.join(tokenChunks)
+       # tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
+       # tokenValue = ''.join(tokenChunks)
        with open("secret/secret.txt") as secret:
           tokenValue = secret.readlines()[0]
 
@@ -605,11 +605,12 @@ def main():
             # number of pull requests, number of contributions, etc.
             # user data needs to be pulled first
             if rep_analyzer.user_data:
+                print(rep_analyzer.user_data)
                 user_dat = {
-                    'Following': [user.following for user in rep_analyzer.user_data],
-                    'Followers': [user.followers for user in rep_analyzer.user_data],
-                    'Num_pull': [len(user.pull_requests) for user in rep_analyzer.user_data],
-                    'Num_contr': [user.contributions for user in rep_analyzer.user_data]}
+                    'Following': [user['following_url'] for user in rep_analyzer.user_data],
+                    'Followers': [user['followers_url'] for user in rep_analyzer.user_data],
+                    # 'Num_pull': [len(user['pull_requests']) for user in rep_analyzer.user_data],
+                    'Num_contr': [user['contributions'] for user in rep_analyzer.user_data]}
                 
                 # convert to df 
                 user_df = pd.DataFrame(user_dat)
