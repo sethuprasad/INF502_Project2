@@ -629,13 +629,15 @@ def main():
                 
                 # Display heatmaps for correlation with each variable? We can remove this if it's too much. 
                 for column in corrs.columns:
-                    plt.figure(figsize = (8, 6))
-                    sns.heatmap(corrs[[column]], 
-                                annot = True, 
-                                cmap = 'coolwarm', 
-                                fmt = ".2f", 
-                                linewidths = 0.5)
+                    plt.figure(figsize = (8,6))
+                    plt.imshow([corrs[column]], 
+                               cmap = 'coolwarm', 
+                               aspect = 'auto', 
+                               extent = [0, 1, 0, 1])
+                    plt.colorbar(label = 'Correlation')
                     plt.title(f"Correlation Heatmap for {column}")
+                    plt.xticks([0.5], [column])
+                    plt.yticks([])
                     plt.show()
 
             else:
