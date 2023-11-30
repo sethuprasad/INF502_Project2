@@ -207,7 +207,7 @@ class GitHUbRepAnalyser:
             following_count = span_tags[1].text.replace(',', '') if len(span_tags) > 1 else 0
  
         print(f"The details for user {username} are: ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\nFollowing : ", following_count, "\nContributions in last year : ", contributions_count)
-        user = User(username, repos_count, followers_count, following_count, contributions_lastYear)
+        user = User(username, repos_count, followers_count, following_count, contributions_count)
         self.save_as_csv('users1.csv', user)
         
     '''def collect_user_data(self, username, repo_name):
