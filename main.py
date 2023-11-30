@@ -620,14 +620,15 @@ def main():
                 # get correlations 
                 corrs = user_df.corr()
                         
-                # print 
+                # print correlations, with short explanation of what the values mean 
                 print("Values close to 1.0 indicate strong positive correlation")
                 print("Values close to -1.0 indicate strong negative correlation")
                 print("Values near 0 indicate weak correlation")
                 
                 print(f"Correlations between data collected for users \n {corrs}")
                 
-                # Display heatmaps for correlation with each variable? We can remove this if it's too much. 
+                # Display heatmaps for correlation with each variable?
+                # Definitely not necessary, but could be a nice visualization for correlations. Feel free to remove this if it's too much or not informative. 
                 for column in corrs.columns:
                     plt.figure(figsize = (8,6))
                     plt.imshow([corrs[column]], 
@@ -635,7 +636,7 @@ def main():
                                aspect = 'auto', 
                                extent = [0, 1, 0, 1])
                     plt.colorbar(label = 'Correlation')
-                    plt.title(f"Correlation Heatmap for {column}")
+                    plt.title(f"Correlation Heatmaps for {column}")
                     plt.xticks([0.5], [column])
                     plt.yticks([])
                     plt.show()
