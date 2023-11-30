@@ -104,10 +104,10 @@ class GitHUbRepAnalyser:
             every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
         #PullRequest objects corresponding repository details
-        if(decision.lower() == 'n'):
+        if(decision.lower() == 'y'):
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
 
-        elif(decision.lower() == 'y'):
+        elif(decision.lower() == 'n'):
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
 
             while 'next' in response.links:
