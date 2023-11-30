@@ -103,10 +103,10 @@ class GitHUbRepAnalyser:
             every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
         #PullRequest objects corresponding repository details
-        if(decision.lower() == 'y'):
+        if(decision.lower() == 'n'):
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
 
-        elif(decision.lower() == 'n'):
+        elif(decision.lower() == 'y'):
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
 
             while 'next' in response.links:
@@ -397,14 +397,14 @@ def main():
 
                 if owner_name in repositoryAndOwner and repositoryAndOwner[owner_name] == repo_name:
                     print(f"You have already collected the required data for the given repository : {repo_name} with Owner : {owner_name}")
-                    user_decision = input("if you would like to continue with the same press ( 'C'- continue ) else press 'N' to enter different repository details : ")
+                    user_decision = input("if you would like to continue with the same press ('C'- continue) else press 'N' to enter a different repository: ")
                     if user_decision.lower() == 'c':
                         continue
                     elif user_decision.lower() == 'n':
                         repo_name = input("Enter the name of the repository: ") 
                         owner_name = input("Enter the username of the repository owner: ")
                         if owner_name in repositoryAndOwner and repositoryAndOwner[owner_name] == repo_name:
-                            print("Sorry..!, returning to Main Menu. Please find a new repositoty to explore further")
+                            print("Sorry..!, returning to the Main Menu. Please find a new repository to explore further")
                             break
                 else:
                     repositoryAndOwner.update({owner_name : repo_name})
@@ -421,12 +421,12 @@ def main():
                 print("Here are the usernames collected from list of pull requests: ")
                 print(list(set(users))) 
                 print()
-                #username = input("If you would like to get information about one of these users, enter the username here: ")
+
                 while True:
                     username = input("If you would like to get information about one of these users, enter the username here: ")
                     if username not in ContributorDetailsRequByUser:
                         ContributorDetailsRequByUser.append(username)
-                        rep_analyzer.collect_user_data(str(username), repo_name)
+                        rep_analyzer.collect_user_data(username)
                     else:
                         print(f"You have already collected the required details of the user : {username}")
 
