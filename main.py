@@ -7,6 +7,7 @@ import os
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 
@@ -607,19 +608,35 @@ def main():
             if rep_analyzer.user_data:
                 print(rep_analyzer.user_data)
                 user_dat = {
-                    'Following': [user['following_url'] for user in rep_analyzer.user_data],
-                    'Followers': [user['followers_url'] for user in rep_analyzer.user_data],
-                    # 'Num_pull': [len(user['pull_requests']) for user in rep_analyzer.user_data],
-                    'Num_contr': [user['contributions'] for user in rep_analyzer.user_data]}
+                    'Following': [user.following for user in rep_analyzer.user_data],
+                    'Followers': [user.followers for user in rep_analyzer.user_data],
+                    'Num_pull': [len(user.pull_requests) if hasattr(user, 'pull_requests') else 0 for user in rep_analyzer.user_data],
+                    'Num_contr': [user.contributions for user in rep_analyzer.user_data]
+                    }
                 
                 # convert to df 
-                user_df = pd.DataFrame(user_dat)
+                user_df = pd.DataFrame(user_dat).fillna(0)
 
                 # get correlations 
                 corrs = user_df.corr()
                         
                 # print 
-                print(f"Correlations between data collected for users \n {corrs}")   
+                print("Values close to 1.0 indicate strong positive correlation")
+                print("Values close to -1.0 indicate strong negative correlation")
+                print("Values near 0 indicate weak correlation")
+                
+                print(f"Correlations between data collected for users \n {corrs}")
+                
+                # Display heatmaps for correlation with each variable? We can remove this if it's too much. 
+                for column in corrs.columns:
+                    plt.figure(figsize = (8, 6))
+                    sns.heatmap(corrs[[column]], 
+                                annot = True, 
+                                cmap = 'coolwarm', 
+                                fmt = ".2f", 
+                                linewidths = 0.5)
+                    plt.title(f"Correlation Heatmap for {column}")
+                    plt.show()
 
             else:
                 print("No user data found.")
