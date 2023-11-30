@@ -99,6 +99,7 @@ class GitHUbRepAnalyser:
 
         #user response
         decision = input(f"We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
+        every_Page_Response = 'N' 
         if decision.lower() == 'n':
             every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
 
