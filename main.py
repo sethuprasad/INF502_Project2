@@ -183,8 +183,31 @@ class GitHUbRepAnalyser:
         else:
             return None
 
+    def collect_user_data(self, username):
+        # To Scrape the user contributions, followers, following, and number of repositories from the GitHub profile page
+        url = f'https://github.com/{username}'
+        response = requests.get(url)
+        
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    def collect_user_data(self, username, repo_name):
+        # Scrape contributions
+        contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
+        contributions = contributions_tag.text.strip().split()[0] if contributions_tag else '0'
+        contributions_count = int(contributions.replace(',', ''))
+
+        # Scrape repositories count
+        repositories_tag = soup.find('span', class_='Counter')
+        repos_count = int(repositories_tag.text.strip().replace(',', '')) if repositories_tag else 0
+
+        # Scrape followers and following
+        span_tags = soup.find_all('span', class_='text-bold color-fg-default')
+        if span_tags:
+            followers_count = span_tags[0].text.replace(',', '') if len(span_tags) > 0 else 0
+            following_count = span_tags[1].text.replace(',', '') if len(span_tags) > 1 else 0
+ 
+        print(f"The details for user {username} are: ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\nFollowing : ", following_count, "\nContributions in last year : ", contributions_count)
+
+    '''def collect_user_data(self, username, repo_name):
         # Use GitHub API to collect user data
         url = f'https://api.github.com/repos/{username}/{repo_name}/contributors'
 
@@ -257,7 +280,7 @@ class GitHUbRepAnalyser:
         contributions_tag = soup.find('h2', class_='f4 text-normal mb-2')
         
         contributions = contributions_tag.text.strip().split()[0] if contributions_tag else '0'
-        return int(contributions.replace(',', ''))
+        return int(contributions.replace(',', ''))'''
     
     def save_as_csv(self, filename, obj):
         # Check if the file exists
