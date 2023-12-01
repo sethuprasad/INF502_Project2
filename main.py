@@ -24,10 +24,10 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       # tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
-       # tokenValue = ''.join(tokenChunks)
-       with open("secret/secret.txt") as secret:
-          tokenValue = secret.readlines()[0]
+       tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
+       tokenValue = ''.join(tokenChunks)
+       # with open("secret/secret.txt") as secret:
+       #    tokenValue = secret.readlines()[0]
 
        self.access_token = tokenValue
        self.headers = {
@@ -44,6 +44,7 @@ class GitHUbRepAnalyser:
 
         #Requesting GitHUb API with required details
         response = requests.get(url, headers=self.headers)
+        self.response = response
         
         #Validating the Response Status code 
         if response.status_code == 200:
@@ -94,29 +95,34 @@ class GitHUbRepAnalyser:
    
         self.pull_request_data = response.json().get('items')
 
-        #user response
-        decision = input(f"We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
-        every_Page_Response = 'N' 
-        if decision.lower() == 'n':
-            every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
-
-        #PullRequest objects corresponding repository details
-        if(decision.lower() == 'y'):
+        if __name__ != "__main__":
             self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
 
-        elif(decision.lower() == 'n'):
-            self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
+        if __name__ == "__main__":
 
-            while 'next' in response.links:
-                next_page_url = response.links['next']['url']
-                response = requests.get(next_page_url)
-                data = response.json()
-                pull_requests = data.get('items', [])
-                self.print_PullRequestsData(pull_requests, owner, repo_name)
-                if every_Page_Response.lower() == 'y':
-                    nextpage = input("Would you like to access the next page of Pull Requests Y/N : ")
-                    if nextpage.lower() == 'n':
-                        break
+            #user response
+            decision = input(f"We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
+            every_Page_Response = 'N' 
+            if decision.lower() == 'n':
+                every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
+
+            #PullRequest objects corresponding repository details
+            if(decision.lower() == 'y'):
+                self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
+
+            elif(decision.lower() == 'n'):
+                self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
+
+                while 'next' in response.links:
+                    next_page_url = response.links['next']['url']
+                    response = requests.get(next_page_url)
+                    data = response.json()
+                    pull_requests = data.get('items', [])
+                    self.print_PullRequestsData(pull_requests, owner, repo_name)
+                    if every_Page_Response.lower() == 'y':
+                        nextpage = input("Would you like to access the next page of Pull Requests Y/N : ")
+                        if nextpage.lower() == 'n':
+                            break
 
 
 
@@ -686,5 +692,5 @@ def main():
             print("\nPLEASE SELECT A VALID OPTION\n")
         
 
-
-main()
+if __name__ == "__main__":
+    main()
