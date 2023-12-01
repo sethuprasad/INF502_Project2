@@ -24,10 +24,10 @@ class GitHUbRepAnalyser:
     def __init__(self):
        self.repositories = []
        #Access token to avoid the rate of limit for accesing the github
-       tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
-       tokenValue = ''.join(tokenChunks)
-       # with open("secret/secret.txt") as secret:
-       #    tokenValue = secret.readlines()[0]
+       #tokenChunks = ["ghp_", "8hNf7", "rJKtiBNG", "snDiWVK", "WN8hRwz", "8Ia2ef6g1"]
+       #tokenValue = ''.join(tokenChunks)
+       with open("secret/secret.txt") as secret:
+           tokenValue = secret.readlines()[0]
 
        self.access_token = tokenValue
        self.headers = {
