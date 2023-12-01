@@ -94,9 +94,6 @@ class GitHUbRepAnalyser:
    
         self.pull_request_data = response.json().get('items')
 
-        #print("Pull Request data is : ")
-        #print(pull_request_data) 
-
         #user response
         decision = input(f"We collected a list of pull requests related to the repository {repo_name}. If you would like to access only the first page of the pull requests, press (Y). To access all pages, press (N) ")
         every_Page_Response = 'N' 
@@ -149,7 +146,7 @@ class GitHUbRepAnalyser:
         for pr in pull_request_data:
                 title = pr.get('title', '')
                 number = pr.get('number', '')
-                body = pr.get('body', '')
+                body = str(pr.get('body', ''))
                 state = pr.get('state', '')
                 created_at = pr.get('created_at', '')
                 closed_at = pr.get('closed_at', '')
@@ -171,7 +168,7 @@ class GitHUbRepAnalyser:
 
                 # creating obj for PullRequest class  
                 pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
-                #self.pr_csv('PullRequests.csv', pull_request)
+                self.save_as_csv('pullrequests.csv', pull_request)
                 repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
                 if repo:
                     repo.pull_requests.append(pull_request)
@@ -310,10 +307,10 @@ class Repository:
         self.pull_requests = []
         
 
-    def csv_Headers(self):
+    def get_csv_header(self):
         return "owner,name,description,homepage,license,forks,watchers"
 
-    def to_CSV(self):
+    def to_csv(self):
         return f"{self.owner},{self.name},{self.description},{self.homepage},{self.License},{self.forks},{self.watchers}"
 
     def check(self):
@@ -336,6 +333,16 @@ class PullRequest:
         self.deletions = deletions
         self.changed_files = changed_files
         users.append(user)
+        
+    def get_csv_header(self):
+        return "title,number,body,state,created_at,closed_at"
+
+    def to_csv(self):
+        body = '\n'.join(self.body)
+        clean_body = body if body else ''
+        clean_body = clean_body.replace('\n', ' ')
+        clean_body = clean_body.replace('"', '""')
+        return f'"{self.title}","{self.number}","{clean_body}","{self.state}","{self.created_at}","{self.closed_at}"'
 
 class User:
     def __init__(self, username, repositories, followers, following, contributions):
@@ -427,17 +434,20 @@ def main():
 
                 while True:
                     username = input("If you would like to get information about one of these users, enter the username here: ")
-                    if username not in ContributorDetailsRequByUser:
-                        ContributorDetailsRequByUser.append(username)
-                        rep_analyzer.collect_user_data(username)
-                    else:
-                        print(f"You have already collected the required details of the user : {username}")
-
-                    decision1 = input("Would you like to continue with a different user Y/N ?")
-                    if decision1.lower() == 'y':
-                        continue
-                    else:
+                    if not username:
                         break
+                    else:                    
+                        if username not in ContributorDetailsRequByUser:
+                            ContributorDetailsRequByUser.append(username)
+                            rep_analyzer.collect_user_data(username)
+                        else:
+                            print(f"You have already collected the required details of the user : {username}")
+
+                        decision1 = input("Would you like to continue with a different user Y/N ?")
+                        if decision1.lower() == 'y':
+                            continue
+                        else:
+                            break
                     
             except Exception as e:
                 print(f"An error occurred: {e}")
