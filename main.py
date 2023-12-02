@@ -22,6 +22,7 @@ class GitHubRepAnalyser:
     # constructor for GitHubRepAnalyser
     def __init__(self):
         self.repositories = [] # list to store repositories
+        self.pull_request_data = [] # list to store pull requests
         
         # read access token from secret.txt
         with open("secret/secret.txt") as secret:
@@ -86,9 +87,6 @@ class GitHubRepAnalyser:
             # Print an error message if the request was not successful
             print(f"Error: {response.status_code} - {response.json()['message']}")
 
-        # initialize list
-        self.pull_request_data = []
-
         # keep track of pages
         num_pages = 0
 
@@ -119,8 +117,8 @@ class GitHubRepAnalyser:
 
             # User choice
             print(f"We collected a list of pull requests related to the repository {repo_name}.")
-            print("The first five pull requests from each page will be printed below, unless you would like to access only the first page of pull requests.")
-            decision = input("If you want to access only the first page of pull requests, enter "Y". To access all pages, enter "N" ")
+            print("The first five pull requests from each page will be printed below.")
+            decision = input("If you want to access only the first page of pull requests, enter \"Y\". To access all pages, enter \"N\" ")
             every_Page_Response = 'N' 
             if decision.lower() == 'n':
                 every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
@@ -128,10 +126,10 @@ class GitHubRepAnalyser:
             # Print first five pull requests from the first page
             if(decision.lower() == 'y'):
                 self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
+            
             # Print first five pull requests from each page
             elif(decision.lower() == 'n'):
                 self.print_PullRequestsData(self.pull_request_data, owner, repo_name)
-
                 while 'next' in response.links:
                     next_page_url = response.links['next']['url']
                     response = requests.get(next_page_url)
@@ -139,11 +137,9 @@ class GitHubRepAnalyser:
                     pull_requests = data.get('items', [])
                     self.print_PullRequestsData(pull_requests, owner, repo_name)
                     if every_Page_Response.lower() == 'y':
-                        nextpage = input("Would you like to access the next page of Pull Requests Y/N : ")
+                        nextpage = input("Would you like to access the next page of pull requests Y/N : ")
                         if nextpage.lower() == 'n':
                             break
-
-
 
     def get_pull_request_details(self, owner, repo_name, number):
         # query to get details like commits, additions, deletions, changed_files
