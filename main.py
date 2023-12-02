@@ -283,7 +283,7 @@ class PullRequest:
         clean_body = body if body else ''
         clean_body = clean_body.replace('\n', ' ')
         clean_body = clean_body.replace('"', '""')
-        return f'"{self.title}","{self.number}","{clean_body}","{self.state}","{self.created_at}","{self.closed_at}"'
+        return f'"{self.title}","{self.number}","{clean_body}","{self.state}","{self.created_at}","{self.closed_at}","{self.commits}","{self.additions}","{self.deletions}","{self.changed_files}"'
 
 class User:
     def __init__(self, username, repositories, followers, following, contributions):
