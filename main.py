@@ -23,6 +23,7 @@ class GitHubRepAnalyser:
     def __init__(self):
         self.repositories = [] # list to store repositories
         self.pull_request_data = [] # list to store pull requests
+        self.user_pr_counts = {}
         
         # read access token from secret.txt
         with open("secret/secret.txt") as secret:
@@ -147,8 +148,8 @@ class GitHubRepAnalyser:
         url = f'https://api.github.com/repos/{owner}/{repo_name}/pulls/{number}'
         response = requests.get(url, headers=self.headers)
 
-        if response.status_code != 200:
-            print("Request un-successful : ", response.status_code)
+        #if response.status_code != 200:
+        #    print("Request un-successful : ", response.status_code)
         
         pr_details = response.json()
 
@@ -177,7 +178,7 @@ class GitHubRepAnalyser:
                     count += 1
                     print("\n","═"*100)
                 elif(count == 5):
-                    print("If you want all of the pull request details, please visit the PullRequests.csv file in your current directory/folder.")
+                    print(f"If you want all of the pull request details, please visit the {owner}-{repo_name}.csv file in your current directory/folder.")
                     count += 1
             
 
@@ -190,14 +191,6 @@ class GitHubRepAnalyser:
                 repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
                 if repo:
                     repo.pull_requests.append(pull_request)
-
-    def get_Data(self, url):
-        response = requests.get(url,headers=self.headers)
-
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
 
     def collect_user_data(self, username):
         # To Scrape the user contributions, followers, following, and number of repositories from the GitHub profile page
