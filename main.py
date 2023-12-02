@@ -588,8 +588,8 @@ def main():
                 user_dat = {
                     'Following': [user.following for user in rep_analyser.user_data],
                     'Followers': [user.followers for user in rep_analyser.user_data],
-                    'Num_pull': [len(user.pull_requests) if hasattr(user, 'pull_requests') else 0 for user in rep_analyzer.user_data],
-                    'Num_contr': [user.contributions for user in rep_analyzer.user_data]
+                    'Num_pull': [len(user.pull_requests) if hasattr(user, 'pull_requests') else 0 for user in rep_analyser.user_data],
+                    'Num_contr': [user.contributions for user in rep_analyser.user_data]
                     }
                 
                 # convert to df 
