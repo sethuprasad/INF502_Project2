@@ -1,11 +1,11 @@
 
 from unittest import TestCase
-from main import GitHUbRepAnalyser
+from main import GitHubRepAnalyser
 
 
 class MainTests(TestCase):
     def setUp(self):
-        self.repo_analyser = GitHUbRepAnalyser()
+        self.repo_analyser = GitHubRepAnalyser()
         self.repo_name = 'INF502_Tests'
         self.user = 'Clockwork-Rat'
 
