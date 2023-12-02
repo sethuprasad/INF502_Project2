@@ -95,7 +95,7 @@ class GitHubRepAnalyser:
             page = response.json()
             pull_requests = page.get('items', [])
             self.pull_request_data.extend(pull_requests)
-            num_pages = += 1
+            num_pages += 1
 
             if 'next' in response_links:
                 next_page_url = response.links['next']['url']
@@ -319,7 +319,7 @@ def main():
     global repositoryAndOwner
 
     # create an instance of the GitHUbRepAnalyser class
-    rep_analyzer = GitHUbRepAnalyser()
+    rep_analyzer = GitHubRepAnalyser()
 
     # main menu
     while True:
@@ -366,11 +366,11 @@ def main():
                     repositoryAndOwner.update({owner_name : repo_name})
 
                 # get repository data 
-                rep_analyzer.collect_repository_data(owner_name, repo_name)
+                rep_analyser.collect_repository_data(owner_name, repo_name)
                 
                 # get pull request data 
                 print()
-                rep_analyzer.collect_pull_requests(owner_name, repo_name)
+                rep_analyser.collect_pull_requests(owner_name, repo_name)
                 
                 # get user data 
                 print()
@@ -385,7 +385,7 @@ def main():
                     else:                    
                         if username not in ContributorDetailsRequByUser:
                             ContributorDetailsRequByUser.append(username)
-                            rep_analyzer.collect_user_data(username)
+                            rep_analyser.collect_user_data(username)
                         else:
                             print(f"You have already collected the required details of the user : {username}")
 
@@ -402,7 +402,7 @@ def main():
         elif userchoice == '2':
             # show all repositories collected 
             print("Here are all of the collected repositories: ")
-            for rep in rep_analyzer.repositories:
+            for rep in rep_analyser.repositories:
                 print(rep.name)
             while True:
                 # submenu options
@@ -420,7 +420,7 @@ def main():
                     # Show all pull requests from a certain repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    repo = next((r for r in rep_analyser.repositories if r.name == repo_name), None)
                     if repo:
                         # print each pull request number and title
                         for pull in repo.pull_requests:
@@ -432,7 +432,7 @@ def main():
                     # Show the summary of a repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    repo = next((r for r in rep_analyser.repositories if r.name == repo_name), None)
                     if repo:
                         # Number of pull requests in `open` state
                         num_open = sum(1 for pull in repo.pull_requests if pull.state == 'open')
@@ -456,7 +456,7 @@ def main():
                     # Create and store visual representation data about the repository
                     repo_name = input("Enter the name of repository: ") 
                     # locate the repository using name 
-                    repo = next((r for r in rep_analyzer.repositories if r.name == repo_name), None)
+                    repo = next((r for r in rep_analyser.repositories if r.name == repo_name), None)
                     if repo:
                         # get all data
                         rep_dat = {
@@ -537,9 +537,9 @@ def main():
 
         elif userchoice == '3':
             # Create and store visual representation data to a data frame for all the repositories
-            if rep_analyzer.repositories:
+            if rep_analyser.repositories:
                 all_repo_data = []
-                for repo in rep_analyzer.repositories:
+                for repo in rep_analyser.repositories:
                     rep_dat = {
                         'Name': repo.name,
                         'Num_pulls': len(repo.pull_requests),
@@ -587,8 +587,8 @@ def main():
             # Calculate the correlation between the data collected for the users - following, followers, 
             # number of pull requests, number of contributions, etc.
             # user data needs to be pulled first
-            if rep_analyzer.user_data:
-                print(rep_analyzer.user_data)
+            if rep_analyser.user_data:
+                print(rep_analyser.user_data)
                 user_dat = {
                     'Following': [user.following for user in rep_analyzer.user_data],
                     'Followers': [user.followers for user in rep_analyzer.user_data],
