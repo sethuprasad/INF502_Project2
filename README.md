@@ -7,6 +7,11 @@ Install requestes
 install lxml
   pip install lxml
 
+Selected repositories:
+1. Rep: piecewiseSEM Owner: jslefche
+2. Rep: glmmTMB Owner: glmmTMB
+3. Rep: ecology Owner: FormidableLabs
+
 
 **Group leaders:**
 
@@ -31,13 +36,11 @@ This function retrieves pull request data related to a specified repository. Use
 
 **4. User Data Collection**
 Function: collect_user_data(username, repo_name)
-This function collects data about a GitHub user's contributions to a specific repository. It includes information on the number of repositories, followers, following, contributions in the last year, and total contributions. If the specified user is not found, the script prompts the user to enter a different username.
+This function collects data about a GitHub user's contributions to a specific repository. It includes information on the number of repositories, followers, following, contributions in the last year, and total contributions. If the specified user is not found, the script prompts the user to enter a different username. It also scrapes user data from their profile page.
 
 **5. Supporting Functions**
 Function: get_pull_request_details(owner, repo_name, number)
 This function retrieves additional details about a specific pull request, such as commits, additions, deletions, and changed files.
-Function: get_Data(url)
-This function sends a request to a specified URL using the GitHub API and returns the JSON response.
 Function: print_PullRequestsData(pull_request_data, owner, repo_name)
 This function prints details about pull requests in a readable format, allowing users to view information about the title, body, state, created date, closed date, and user.
 
@@ -48,26 +51,19 @@ Ensure you have the necessary permissions to access the specified repository and
 Use the script responsibly, taking into consideration GitHub's API usage policies.
 The script provides a basic overview and can be extended for more advanced use cases or additional functionalities.
 
-
-**7.scrape_user_contributions(self, username)**
-This function scrapes a GitHub user's contributions from their profile page. It extracts the number of contributions made in the last year.
-save_as_csv(self, filename, obj)
-This function saves an object's data to a CSV file. If the file does not exist, it creates a new file with a header. If the file exists, it appends a new line with the object's data.
-
-
-**8.Repository Class**
+**7.Repository Class**
 This class represents a GitHub repository and contains attributes such as owner, name, description, homepage, license, forks, watchers, and a list of pull requests.
 
-**9.PullRequest Class**
+**8.PullRequest Class**
 This class represents a GitHub pull request and includes attributes like title, number, body, state, created_at, closed_at, user, commits, additions, deletions, and changed_files.
 
-**10.User Class**
+**9.User Class**
 This class represents a GitHub user and includes attributes like username, repositories, followers, following, and contributions.
 
-**11.main() Function**
+**10.main() Function**
 The main function serves as a menu-driven interface for the GitHub Repository Analyzer. It allows users to perform various actions, including collecting data for a specific repository, visualizing data, calculating correlations, and exiting the program.
 
-**12.Visualizations**
+**11.Visualizations**
 The program generates visual representations using the Matplotlib library, including boxplots, scatterplots, and bar plots, to provide a clearer understanding of the collected data.
 
 
