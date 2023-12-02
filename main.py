@@ -22,6 +22,7 @@ class GitHubRepAnalyser:
     # constructor for GitHubRepAnalyser
     def __init__(self):
         self.repositories = [] # list to store repositories
+        self.user_data =[]
         self.pull_request_data = [] # list to store pull requests
         self.user_pr_counts = {}
         
@@ -222,6 +223,7 @@ class GitHubRepAnalyser:
         print(f"The details for user {username} are: ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\nFollowing : ", following_count, "\nContributions in last year : ", contributions_count)
         user = User(username, repos_count, followers_count, following_count, contributions_count)
         self.save_as_csv('users.csv', user)
+        self.user_data.append(user)
 
     # Method to save as csv 
     def save_as_csv(self, filename, obj):
@@ -584,8 +586,8 @@ def main():
             if rep_analyser.user_data:
                 print(rep_analyser.user_data)
                 user_dat = {
-                    'Following': [user.following for user in rep_analyzer.user_data],
-                    'Followers': [user.followers for user in rep_analyzer.user_data],
+                    'Following': [user.following for user in rep_analyser.user_data],
+                    'Followers': [user.followers for user in rep_analyser.user_data],
                     'Num_pull': [len(user.pull_requests) if hasattr(user, 'pull_requests') else 0 for user in rep_analyzer.user_data],
                     'Num_contr': [user.contributions for user in rep_analyzer.user_data]
                     }
