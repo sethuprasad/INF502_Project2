@@ -142,7 +142,7 @@ class GitHubRepAnalyser:
                         nextpage = input("\nWould you like to access the next page of pull requests Y/N : ")
                         if nextpage.lower() == 'n':
                             break
-
+    # Method to collect details for pull requests 
     def get_pull_request_details(self, owner, repo_name, number):
         # query to get details like commits, additions, deletions, changed_files
         url = f'https://api.github.com/repos/{owner}/{repo_name}/pulls/{number}'
@@ -150,16 +150,18 @@ class GitHubRepAnalyser:
 
         #if response.status_code != 200:
         #    print("Request un-successful : ", response.status_code)
-        
-        pr_details = response.json()
 
+        # get number of commits, additions, deletions, and changed files
+        pr_details = response.json()
         commits = pr_details.get('commits', 0)
         additions = pr_details.get('additions', 0)
         deletions = pr_details.get('deletions', 0)
         changed_files = pr_details.get('changed_files', 0)
 
+        # return as dictionary 
         return {'commits': commits, 'additions': additions, 'deletions': deletions, 'changed_files': changed_files}
-    
+
+    # Method to print and save pull request data 
     def print_PullRequestsData(self, pull_request_data, owner, repo_name):
         count = 0
         for pr in pull_request_data:
@@ -181,12 +183,13 @@ class GitHubRepAnalyser:
                     print(f"If you want all of the pull request details, please visit the {owner}-{repo_name}.csv file in your current directory/folder.")
                     count += 1
             
-
                 # Additional query to get details like commits, additions, deletions, changed_files
                 pr_details = self.get_pull_request_details(owner, repo_name, number)
 
                 # creating obj for PullRequest class  
                 pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
+                
+                # save p
                 self.save_as_csv(f'{owner}-{repo_name}.csv', pull_request)
                 repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
                 if repo:
@@ -271,7 +274,7 @@ class PullRequest:
         users.append(user)
         
     def get_csv_header(self):
-        return "title,number,body,state,created_at,closed_at"
+        return "title,number,body,state,created_at,closed_at, commits,additions,deletions,changed_files"
 
     def to_csv(self):
         body = '\n'.join(self.body)
