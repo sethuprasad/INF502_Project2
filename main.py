@@ -95,10 +95,10 @@ class GitHubRepAnalyser:
             pull_requests = page.get('items', [])
             self.pull_request_data.extend(pull_requests)
             num_pages += 1
-
+            
             if 'next' in response_links:
                 next_page_url = response.links['next']['url']
-                response = response = requests.get(next_page_url, headers=self.headers)
+                response = requests.get(next_page_url, headers=self.headers)
             else:
                 break
 
