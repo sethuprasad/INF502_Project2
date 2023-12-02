@@ -96,14 +96,15 @@ class GitHubRepAnalyser:
             self.pull_request_data.extend(pull_requests)
             num_pages += 1
             
-            if 'next' in response_links:
-                next_page_url = response.links['next']['url']
+            response_links = response.headers.get('Link')
+            if response_links and 'rel="next"' in response_links:
+                next_page_url = response_links.split('; rel="next"')[0].strip('<').strip('>')
                 response = requests.get(next_page_url, headers=self.headers)
             else:
                 break
 
         # print # of pull requests in repo and # of pages of PR 
-        num_pr = len(self.pull_requests_data)
+        num_pr = len(self.pull_request_data)
         print(f"Total number of pull requests: {num_pr}")
         print(f"Total number of pages: {num_pages}")
         
@@ -314,7 +315,7 @@ def main():
     global repositoryAndOwner
 
     # create an instance of the GitHUbRepAnalyser class
-    rep_analyzer = GitHubRepAnalyser()
+    rep_analyser = GitHubRepAnalyser()
 
     # main menu
     while True:
