@@ -194,7 +194,8 @@ class GitHubRepAnalyser:
                 repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
                 if repo:
                     repo.pull_requests.append(pull_request)
-
+                    
+    # Method to collect user data through API and scraping
     def collect_user_data(self, username):
         # To Scrape the user contributions, followers, following, and number of repositories from the GitHub profile page
         url = f'https://github.com/{username}'
@@ -216,11 +217,13 @@ class GitHubRepAnalyser:
         if span_tags:
             followers_count = span_tags[0].text.replace(',', '') if len(span_tags) > 0 else 0
             following_count = span_tags[1].text.replace(',', '') if len(span_tags) > 1 else 0
- 
+
+        # Print, store, and save user details
         print(f"The details for user {username} are: ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\nFollowing : ", following_count, "\nContributions in last year : ", contributions_count)
         user = User(username, repos_count, followers_count, following_count, contributions_count)
         self.save_as_csv('users.csv', user)
-    
+
+    # Method to save as csv 
     def save_as_csv(self, filename, obj):
         # Check if the file exists
         if not os.path.isfile(filename):
@@ -245,7 +248,6 @@ class Repository:
         self.watchers = watchers
         self.pull_requests = []
         
-
     def get_csv_header(self):
         return "owner,name,description,homepage,license,forks,watchers"
 
@@ -296,7 +298,6 @@ class User:
 
     def to_csv(self):
         return f"{self.username},{self.repositories},{self.followers},{self.following},{self.contributions}"
-
 
 
 ### MAIN MENU ### 
