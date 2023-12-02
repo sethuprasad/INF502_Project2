@@ -69,6 +69,7 @@ class GitHubRepAnalyser:
 
         # Creating object for Repository class to store the required details fetched 
         repoData_obj = Repository(owner, repo_name, description, homepage, License, forks, watchers)
+        self.save_as_csv('repositories.csv', repoData_obj)
         self.repositories.append(repoData_obj)
 
     # Method to collect and print pull requests for a repository 
@@ -185,7 +186,7 @@ class GitHubRepAnalyser:
 
                 # creating obj for PullRequest class  
                 pull_request = PullRequest(title, number, body, state, created_at, closed_at, user, **pr_details)
-                self.save_as_csv('pullrequests.csv', pull_request)
+                self.save_as_csv(f'{owner}-{repo_name}.csv', pull_request)
                 repo = next((r for r in self.repositories if r.owner == owner and r.name == repo_name), None)
                 if repo:
                     repo.pull_requests.append(pull_request)
@@ -222,17 +223,17 @@ class GitHubRepAnalyser:
  
         print(f"The details for user {username} are: ","\nUser : ", username, "\nRepositories : ", repos_count, "\nFollowers : ", followers_count, "\nFollowing : ", following_count, "\nContributions in last year : ", contributions_count)
         user = User(username, repos_count, followers_count, following_count, contributions_count)
-        self.save_as_csv('users1.csv', user)
+        self.save_as_csv('users.csv', user)
     
     def save_as_csv(self, filename, obj):
         # Check if the file exists
         if not os.path.isfile(filename):
             # Create the file with a header
-            with open(filename, 'w') as file:
+            with open(filename, 'w', encoding='utf-8') as file:
                 file.write(obj.get_csv_header() + '\n')
 
         # Append a new line with the object in CSV format
-        with open(filename, 'a') as file:
+        with open(filename, 'a', encoding='utf-8') as file:
             file.write(obj.to_csv() + '\n')
 
    
