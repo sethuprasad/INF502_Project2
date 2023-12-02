@@ -46,10 +46,10 @@ class GitHubRepAnalyser:
         
         # Validating the Response Status code 
         if response.status_code == 200:
-            print("Repository Data - Request Successful - Ok : ", response.status_code)
+            print("\nRepository Data - Request Successful - Ok : ", response.status_code)
         else:
             # Print an error message if the request was not successful
-            print(f"Error : {response.status_code} - {response.json()['message']}")
+            print(f"\nError : {response.status_code} - {response.json()['message']}")
 
         # convert JSON response to a dictionary repo_data
         repo_data = response.json()
@@ -64,8 +64,7 @@ class GitHubRepAnalyser:
         currentDate = datetime.now()
         
         # Print the required details
-        print()
-        print(f"The details for repository \"{repo_name}\" owned by {owner} are below")
+        print(f"\nThe details for repository \"{repo_name}\" owned by {owner} are below")
         print(f"\t Description : {description} \n\t HomePage : {homepage} \n\t License : {License} \n\t Forks : {forks} \n\t Watchers : {watchers} \n\t Date collected : {currentDate}")
 
         # Creating object for Repository class to store the required details fetched 
@@ -82,10 +81,10 @@ class GitHubRepAnalyser:
 
         # Validating the Response Status code 
         if response.status_code == 200:
-            print("Pull Request - Request Successful - Ok : ", response.status_code)
+            print("\nPull Request - Request Successful - Ok : ", response.status_code)
         else:
             # Print an error message if the request was not successful
-            print(f"Error: {response.status_code} - {response.json()['message']}")
+            print(f"\nError: {response.status_code} - {response.json()['message']}")
 
         # keep track of pages
         num_pages = 0
@@ -116,12 +115,12 @@ class GitHubRepAnalyser:
         if __name__ == "__main__":
 
             # User choice
-            print(f"We collected a list of pull requests related to the repository {repo_name}.")
+            print(f"\nWe collected a list of pull requests related to the repository {repo_name}.")
             print("The first five pull requests from each page will be printed below.")
             decision = input("If you want to access only the first page of pull requests, enter \"Y\". To access all pages, enter \"N\" ")
             every_Page_Response = 'N' 
             if decision.lower() == 'n':
-                every_Page_Response = input("Would you like to be asked to proceed before moving to every new page? (Y/N): ")
+                every_Page_Response = input("\nWould you like to be asked to proceed before moving to every new page? (Y/N): ")
 
             # Print first five pull requests from the first page
             if(decision.lower() == 'y'):
@@ -137,7 +136,7 @@ class GitHubRepAnalyser:
                     pull_requests = data.get('items', [])
                     self.print_PullRequestsData(pull_requests, owner, repo_name)
                     if every_Page_Response.lower() == 'y':
-                        nextpage = input("Would you like to access the next page of pull requests Y/N : ")
+                        nextpage = input("\nWould you like to access the next page of pull requests Y/N : ")
                         if nextpage.lower() == 'n':
                             break
 
@@ -147,11 +146,7 @@ class GitHubRepAnalyser:
         response = requests.get(url, headers=self.headers)
 
         if response.status_code != 200:
-            print("Request Un-Successfull : ", response.status_code)
-        #else:
-            # Print an error message if the request was not successful
-            #print(f"Error: {response.status_code} - {response.json()['message']}")
-
+            print("Request un-successful : ", response.status_code)
         
         pr_details = response.json()
 
